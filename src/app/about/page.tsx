@@ -66,7 +66,7 @@ export default function AboutPage() {
           <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">The loop</h2>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <LoopCard title="Contractor submits" body="Drawing or evidence package lands with version, file hash, and private storage pointer." tone="blue" />
-            <LoopCard title="Certifier signs on-chain" body="Approval sends a structured Solana Memo transaction; payout cannot become ready without that signature." tone="violet" />
+            <LoopCard title="Certifier signs on-chain" body="Approval sends a structured Solana Memo transaction; payout cannot be readied without that signature." tone="violet" />
             <LoopCard title="Owner pays out" body="One click moves devnet USDC and links the transfer to the approval record." tone="green" />
           </div>
         </div>
