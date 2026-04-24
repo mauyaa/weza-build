@@ -16,6 +16,7 @@ import {
   TokenAccountNotFoundError,
 } from "@solana/spl-token";
 import { env } from "./env";
+import { executeOrCreateSquadsPayout, isSquadsConfigured } from "./squads";
 
 /**
  * WEZA Build pays contractors on Solana devnet in devnet USDC. The on-chain
@@ -40,12 +41,14 @@ const USDC_DECIMALS = 6;
 export interface OnChainPayoutArgs {
   amountUsdc: number;
   recipient: string;
+  approvalPda: string;
   memo: {
     projectCode: string;
     milestoneSequence: number;
     milestoneId: string;
     submissionId?: string | null;
     approvedBy: string;
+    approvalPda?: string | null;
   };
 }
 
@@ -57,6 +60,9 @@ export interface OnChainPayoutResult {
   asset: "USDC";
   amountAtomic: string;
   memo: string;
+  approvalTxSignature?: string | null;
+  squadsMultisig?: string | null;
+  squadsProposalTx?: string | null;
 }
 
 export function explorerUrl(signature: string): string {
@@ -97,8 +103,18 @@ function connection(): Connection {
   return _conn;
 }
 
-function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: TransactionInstruction; memo: string } {
-  const memo = JSON.stringify({
+export function getSolanaConnection(): Connection {
+  return connection();
+}
+
+export function loadSolanaTreasury(): Keypair {
+  return loadTreasury();
+}
+
+export function buildMemoInstruction(
+  payload: OnChainPayoutArgs["memo"] | string
+): { ix: TransactionInstruction; memo: string } {
+  const memo = typeof payload === "string" ? payload : JSON.stringify({
     app: "weza-build",
     v: 1,
     project: payload.projectCode,
@@ -106,6 +122,7 @@ function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: Transac
     milestone_id: payload.milestoneId,
     submission_id: payload.submissionId ?? null,
     approved_by: payload.approvedBy,
+    approval_pda: payload.approvalPda ?? null,
   });
   const ix = new TransactionInstruction({
     keys: [],
@@ -113,6 +130,13 @@ function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: Transac
     data: Buffer.from(memo, "utf8"),
   });
   return { ix, memo };
+}
+
+export async function sendTreasuryTransaction(...instructions: TransactionInstruction[]): Promise<string> {
+  const tx = new Transaction().add(...instructions);
+  return sendAndConfirmTransaction(connection(), tx, [loadTreasury()], {
+    commitment: "confirmed",
+  });
 }
 
 export interface TreasuryStatus {
@@ -214,6 +238,16 @@ export async function performDevnetPayoutProof(args: OnChainPayoutArgs): Promise
   );
 
   const { ix: memoIx, memo } = buildMemoInstruction(args.memo);
+  let approvalPk: PublicKey;
+  try {
+    approvalPk = new PublicKey(args.approvalPda);
+  } catch {
+    throw new Error(`Approval PDA ${args.approvalPda} is not a valid Solana public key`);
+  }
+  const approvalAccount = await conn.getAccountInfo(approvalPk);
+  if (!approvalAccount) {
+    throw new Error(`Approval PDA ${approvalPk.toBase58()} does not exist; payout is locked`);
+  }
   const transferIx = createTransferCheckedInstruction(
     treasuryAta.address,
     DEVNET_USDC_MINT,
@@ -224,6 +258,27 @@ export async function performDevnetPayoutProof(args: OnChainPayoutArgs): Promise
     [],
     TOKEN_PROGRAM_ID
   );
+  transferIx.keys.push({ pubkey: approvalPk, isSigner: false, isWritable: false });
+
+  if (isSquadsConfigured()) {
+    const result = await executeOrCreateSquadsPayout({
+      transferIx,
+      memoIx,
+      memo,
+      approvalPda: approvalPk,
+      amountAtomic: atomicAmount.toString(),
+    });
+    return {
+      txSignature: result.txSignature,
+      network: result.network,
+      confirmed: result.confirmed,
+      explorerUrl: explorerUrl(result.txSignature),
+      asset: "USDC",
+      amountAtomic: atomicAmount.toString(),
+      memo,
+      approvalTxSignature: result.approvalTxSignature,
+    };
+  }
 
   const tx = new Transaction().add(memoIx, transferIx);
   const signature = await sendAndConfirmTransaction(conn, tx, [payer], {

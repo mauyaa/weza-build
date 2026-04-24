@@ -7,6 +7,8 @@ import { formatUsdc, formatDate, timeAgo } from "@/lib/format";
 import { MilestoneChip, PayoutChip, SubmissionChip } from "@/components/status-chip";
 import { AuditRow } from "@/components/audit-row";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectDetail({ params }: { params: { id: string } }) {
   const profile = (await getCurrentProfile())!;
   const project = await getProject(params.id);

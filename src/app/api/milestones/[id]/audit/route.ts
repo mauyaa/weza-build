@@ -40,6 +40,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     milestone: {
       status: milestoneRow.status,
       payout_status: milestoneRow.payout_status,
+      approval_tx_signature: milestoneRow.approval_tx_signature,
+      approval_pda: milestoneRow.approval_pda,
       payout_tx_signature: milestoneRow.payout_tx_signature,
       updated_at: milestoneRow.updated_at,
     },

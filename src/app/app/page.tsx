@@ -6,8 +6,11 @@ import { formatUsdc } from "@/lib/format";
 import { AuditRow } from "@/components/audit-row";
 import { ActionCard } from "@/components/action-card";
 
+export const dynamic = "force-dynamic";
+
 export default async function Dashboard() {
-  const profile = (await getCurrentProfile())!;
+  const profile = await getCurrentProfile();
+  if (!profile) return null;
   const [kpis, queue, audit, projects] = await Promise.all([
     dashboardKpis(profile),
     actionQueue(profile),

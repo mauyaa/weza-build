@@ -55,6 +55,26 @@ export function PayoutPanel({
         <Row label="Amount" value={<span className="mono font-semibold">{formatUsdc(milestone.payout_amount_usdc)}</span>} />
         <Row label="Recipient" value={<span className="mono">{shortWallet(recipient)}</span>} />
         <Row label="Network" value={<span className="mono">solana-devnet</span>} />
+        <Row
+          label="Approval gate"
+          value={
+            milestone.approval_tx_signature ? (
+              <a
+                href={`https://explorer.solana.com/tx/${milestone.approval_tx_signature}?cluster=devnet`}
+                target="_blank"
+                rel="noreferrer"
+                className="mono text-brand-700 hover:underline"
+              >
+                {shortSig(milestone.approval_tx_signature, 8)}
+              </a>
+            ) : (
+              <span className="text-amber-700">Waiting for on-chain approval</span>
+            )
+          }
+        />
+        {milestone.approval_pda && (
+          <Row label="Approval address" value={<span className="mono">{shortWallet(milestone.approval_pda)}</span>} />
+        )}
         {payout?.triggered_at && (
           <Row label="Triggered" value={<span>{formatDateTime(payout.triggered_at)}</span>} />
         )}

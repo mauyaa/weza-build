@@ -41,9 +41,16 @@ export const env = {
   databaseUrl: () => required("DATABASE_URL"),
   solanaRpcUrl: () => process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com",
   solanaTreasuryKeypair: () => process.env.SOLANA_TREASURY_KEYPAIR || "",
+  solanaCertifierKeypair: () =>
+    process.env.SOLANA_CERTIFIER_KEYPAIR || process.env.SOLANA_TREASURY_KEYPAIR || "",
+  wezaApprovalProgramId: () =>
+    process.env.WEZA_APPROVAL_PROGRAM_ID || "ABaXxAFwdeKc82mocL2nKzd1JsVdXDKtesxArpEyqNxH",
+  squadsMultisigPda: () => process.env.SQUADS_MULTISIG_PDA || "",
+  requireSquadsPayout: () => process.env.WEZA_REQUIRE_SQUADS_PAYOUT === "1",
   solanaCluster: () => process.env.SOLANA_CLUSTER || "devnet",
   isProduction: () => process.env.NODE_ENV === "production",
   allowMockSolana: () =>
     process.env.NODE_ENV !== "production" && process.env.WEZA_MOCK_SOLANA === "1",
+  allowPublicSignup: () => process.env.WEZA_PUBLIC_SIGNUP === "1",
   storageBucket: () => process.env.WEZA_STORAGE_BUCKET || "submissions",
 };

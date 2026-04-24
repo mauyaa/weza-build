@@ -2,6 +2,8 @@ import { getCurrentProfile } from "@/lib/session";
 import { listProjectsForUser } from "@/lib/repo";
 import { ProjectsTable } from "./projects-table";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectsPage() {
   const profile = (await getCurrentProfile())!;
   const projects = await listProjectsForUser(profile);

@@ -2,6 +2,8 @@ import { getCurrentProfile } from "@/lib/session";
 import { recentAudit } from "@/lib/views";
 import { AuditRow } from "@/components/audit-row";
 
+export const dynamic = "force-dynamic";
+
 export default async function AuditPage() {
   const profile = (await getCurrentProfile())!;
   const events = await recentAudit(profile, 200);

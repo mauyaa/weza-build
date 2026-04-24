@@ -10,9 +10,8 @@ Every item here maps to a concrete action you take outside the codebase. Check t
 
 ## 1 — Merge the code
 
-- [ ] Merge PR #2 (`cursor/supabase-migration-864b`) into `main`.
-- [ ] Merge PR #3 (`cursor/winability-864b`) into `main`.
-- [ ] Close PR #1 (`cursor/weza-build-takeover-864b`) — it's subsumed.
+- [ ] Merge the current Cloud Agent PR into `main`.
+- [ ] Confirm `main` contains Supabase migrations, seed data, Solana approval proof gating, and the Vercel build fix.
 - [ ] Update the repo's default branch to `main` if it isn't already.
 
 ## 2 — Stand up Supabase (~20 minutes)
@@ -60,6 +59,7 @@ Every item here maps to a concrete action you take outside the codebase. Check t
     - [ ] `WEZA_STORAGE_BUCKET` = `submissions`
 - [ ] Do **not** set `WEZA_MOCK_SOLANA`.
 - [ ] Deploy.
+- [ ] Leave `WEZA_PUBLIC_SIGNUP=0` unless you are intentionally testing signup. Judges should use seeded demo users.
 
 ## 6 — Seed demo data (~2 minutes)
 
@@ -72,11 +72,11 @@ From your laptop, with the live envs loaded:
 
 Walk through `docs/SMOKE_TEST.md` end to end.
 
-- [ ] §1 `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
+- [ ] §1 `/api/health/config` returns `success: true`; `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
 - [ ] §2 signup creates auth user + profile.
 - [ ] §3 login succeeds, wrong password is rejected.
 - [ ] §4 full loop runs, produces a real 88-char base58 signature.
-- [ ] §4 Explorer view shows **Memo instruction** with JSON + **TransferChecked** for USDC mint `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`.
+- [ ] §4 Explorer view shows an approval **Memo instruction** first, then payout **Memo + TransferChecked** for USDC mint `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`.
 - [ ] §4 idempotency — double-click returns same signature.
 - [ ] §5 RLS sanity — running as `authenticated` for a non-member returns no project rows.
 - [ ] §6 file download — member gets 302 + signed URL; non-member gets 403.
@@ -109,8 +109,8 @@ Walk through `docs/SMOKE_TEST.md` end to end.
 
 - [ ] Use `docs/HACKATHON_CANVAS.md` to fill the canvas.
 - [ ] Devpost fields map 1:1 to the canvas sections.
-- [ ] Tagline: "Approval-to-payout for construction. On Solana."
-- [ ] Short description: "Drawings, revisions, and milestone sign-off move directly into payout on Solana devnet, with a permanent audit trail tying every transaction to a specific approval."
+- [ ] Tagline: "On-chain approval-to-payout for African construction."
+- [ ] Short description: "WEZA records certifier approval on Solana first, then unlocks devnet USDC payout with a permanent audit trail for Nairobi construction teams."
 - [ ] Long description: combine canvas sections 1–6.
 
 ## 12 — Final sanity (30 minutes before deadline)
@@ -137,7 +137,7 @@ Walk through `docs/SMOKE_TEST.md` end to end.
 - Two videos that stay under 3:00.
 - Three real user quotes.
 - A live deploy that never goes down during judging week.
-- A single memo-tagged USDC signature they can click through to on Solana Explorer.
-- An honest narrative: one product, one loop, one payout primitive.
+- An approval signature and payout signature they can click through to on Solana Explorer.
+- An honest narrative: one product, one loop, public approval proof before payout.
 
-If you do all of the above, you are in the top few percent of submissions by completeness. That gives you a credible shot at a top-20 standout prize. Grand Champion is a different conversation — for that, the pilot needs to actually happen, and you need to be able to say "this tool moved real USDC between two parties on a real construction project," which is work that extends past the submission itself.
+If you do all of the above, the submission is unusually complete: live product, real Solana evidence, clear market wedge, and honest traction plan. Winning still depends on judge taste and pilot evidence; do not claim inevitability, show proof.

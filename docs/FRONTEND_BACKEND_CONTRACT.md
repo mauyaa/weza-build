@@ -70,7 +70,7 @@ Body: `{ body }`. Writes one comment + one `submission.comment_added` audit row.
 
 Body: `{ action: "approve"|"request_revision"|"reject", note }`. Runs in a single transaction:
 
-- `approve` → submission `approved`, milestone `approved`, payout `ready`, `payout_instructions` row created with contractor wallet, three audit rows (`submission.approved`, `milestone.approved`, `milestone.payout_ready`).
+- `approve` → first records a Solana milestone approval proof, then submission `approved`, milestone `approved`, payout `ready`, `payout_instructions` row created with contractor wallet, and audit rows (`approval.recorded_onchain`, `submission.approved`, `milestone.approved`, `milestone.payout_ready`).
 - `request_revision` → submission `revision_requested`, one audit row.
 - `reject` → submission `rejected`, one audit row.
 
@@ -79,7 +79,7 @@ Returns `{ decision, submission, milestone, payout, audit }`. Idempotent on repe
 ### `POST /api/milestones/:id/payout` (owner)
 
 1. Locks payout to `triggered`; writes `payout.triggered` audit row.
-2. Calls `performDevnetPayoutProof` → `SystemProgram.transfer` on Solana devnet via `SOLANA_RPC_URL` using `SOLANA_TREASURY_KEYPAIR`.
+2. Refuses to run unless the milestone has a stored approval transaction signature and correlation address, then calls `performDevnetPayoutProof` → USDC `TransferChecked` + Memo on Solana devnet via `SOLANA_RPC_URL` using `SOLANA_TREASURY_KEYPAIR`.
 3. On success: payout `confirmed`, milestone `settled`, `payout.confirmed` audit row with signature.
 4. On failure: payout `failed`, milestone reverts to `approved`, retryable.
 

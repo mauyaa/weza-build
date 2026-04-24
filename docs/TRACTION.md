@@ -1,6 +1,6 @@
 # Traction and market evidence
 
-Colosseum weights *early user feedback* and *evidence of product-market fit* even when it's informal. This document is where that evidence lives. Populate the empty bullets with real, attributable quotes before submitting.
+Colosseum weights *early user feedback* and *evidence of product-market fit* even when it's informal. This document is the operating checklist for evidence. Do not submit invented quotes; if a partner has not given permission to be named, use an anonymised row with date, role, region, and the exact problem described.
 
 ## Market numbers (cite these in the deck and pitch)
 
@@ -18,11 +18,11 @@ Colosseum weights *early user feedback* and *evidence of product-market fit* eve
 | Top cited root cause for slow payment: *lack of organized process*     | GlobeNewswire, 2025 |
 | RWAs on Solana grew **141 % in 2025**, reaching > $24 B TVL mid-year   | Solana RWA market reports, 2025 |
 
-## Design-partner outreach (fill in before submission)
+## Design-partner outreach
 
 The judges don't need signed contracts. They need evidence that you've talked to real operators and they said something specific enough that you couldn't have made it up.
 
-### Template
+### Required evidence format
 
 - **Firm / person**
 - **Role** (owner / GC / sub / QS / architect)
@@ -33,24 +33,15 @@ The judges don't need signed contracts. They need evidence that you've talked to
 - **Their reaction to the prototype** (1 sentence)
 - **Commitment** (none / intro / willing to pilot / signed LOI / live project)
 
-### Partner 1
+### Current status
 
-- **Firm / person:** _<replace>_
-- **Role:** _<replace>_
-- **Region:** _<replace>_
-- **Contacted on:** _<replace>_
-- **Channel:** _<replace>_
-- **Problem quote:** _<replace — exact words, no paraphrase>_
-- **Prototype reaction:** _<replace>_
-- **Commitment:** _<replace>_
+No attributable design-partner quote is committed in this repo yet. Before submission, collect at least three operator conversations and fill this section with evidence. If that cannot be done, say so plainly in the pitch and compete on product completeness plus the live Solana proof rather than pretending traction exists.
 
-### Partner 2
-
-- _<same template>_
-
-### Partner 3
-
-- _<same template>_
+| Contact | Role | Region | Date | Channel | Problem quote | Prototype reaction | Commitment |
+|---------|------|--------|------|---------|---------------|--------------------|------------|
+| To collect | Contractor / QS / owner | Nairobi / Kenya | To collect | WhatsApp / call / in person | To collect | To collect | To collect |
+| To collect | Contractor / QS / owner | Nairobi / Kenya | To collect | WhatsApp / call / in person | To collect | To collect | To collect |
+| To collect | Contractor / QS / owner | Nairobi / Kenya | To collect | WhatsApp / call / in person | To collect | To collect | To collect |
 
 ## User-problem interview questions (use these)
 

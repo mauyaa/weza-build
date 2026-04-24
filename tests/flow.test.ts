@@ -9,7 +9,7 @@ import {
   triggerPayout,
 } from "../src/lib/repo";
 import { sha256 } from "../src/lib/ids";
-import { seedFixture, type Fixture } from "./helpers";
+import { approvalProof, seedFixture, type Fixture } from "./helpers";
 
 function submit(milestoneId: string, actor: Fixture["contractor"], version: number) {
   return submitPackage({
@@ -50,6 +50,7 @@ describe("approval-to-payout flow", () => {
       actor: fx.certifier,
       action: "approve",
       note: "ok",
+      onChainApproval: approvalProof(fx.milestone.id),
     });
     expect(d2.submission.status).toBe("approved");
     expect(d2.milestone.status).toBe("approved");
@@ -60,7 +61,11 @@ describe("approval-to-payout flow", () => {
     const result = await triggerPayout({
       milestoneId: fx.milestone.id,
       actor: fx.owner,
-      runOnChain: async (_args) => ({ txSignature: mockSig, network: "solana-devnet", confirmed: true }),
+      runOnChain: async (args) => {
+        expect(args.approvalPda).toBe(d2.milestone.approval_pda);
+        expect(args.memo.approvalPda).toBe(d2.milestone.approval_pda);
+        return { txSignature: mockSig, network: "solana-devnet", confirmed: true };
+      },
     });
     expect(result.milestone.status).toBe("settled");
     expect(result.milestone.payout_status).toBe("confirmed");
@@ -80,10 +85,29 @@ describe("approval-to-payout flow", () => {
     ).rejects.toBeInstanceOf(DomainError);
   });
 
+  it("requires on-chain approval proof before approval unlocks payout", async () => {
+    const fx = await seedFixture();
+    const s1 = await submit(fx.milestone.id, fx.contractor, 1);
+    await expect(
+      decide({
+        submissionId: s1.submission.id,
+        actor: fx.certifier,
+        action: "approve",
+        note: "",
+      })
+    ).rejects.toMatchObject({ code: "approval_not_onchain" });
+  });
+
   it("forbids contractor triggering a payout", async () => {
     const fx = await seedFixture();
     const s1 = await submit(fx.milestone.id, fx.contractor, 1);
-    await decide({ submissionId: s1.submission.id, actor: fx.certifier, action: "approve", note: "" });
+    await decide({
+      submissionId: s1.submission.id,
+      actor: fx.certifier,
+      action: "approve",
+      note: "",
+      onChainApproval: approvalProof(fx.milestone.id),
+    });
     await expect(
       triggerPayout({
         milestoneId: fx.milestone.id,
@@ -96,7 +120,13 @@ describe("approval-to-payout flow", () => {
   it("is idempotent on duplicate approve and duplicate payout trigger", async () => {
     const fx = await seedFixture();
     const s1 = await submit(fx.milestone.id, fx.contractor, 1);
-    await decide({ submissionId: s1.submission.id, actor: fx.certifier, action: "approve", note: "" });
+    await decide({
+      submissionId: s1.submission.id,
+      actor: fx.certifier,
+      action: "approve",
+      note: "",
+      onChainApproval: approvalProof(fx.milestone.id),
+    });
     const duplicate = await decide({
       submissionId: s1.submission.id,
       actor: fx.certifier,
@@ -126,14 +156,26 @@ describe("approval-to-payout flow", () => {
   it("blocks submissions after approval", async () => {
     const fx = await seedFixture();
     const s1 = await submit(fx.milestone.id, fx.contractor, 1);
-    await decide({ submissionId: s1.submission.id, actor: fx.certifier, action: "approve", note: "" });
+    await decide({
+      submissionId: s1.submission.id,
+      actor: fx.certifier,
+      action: "approve",
+      note: "",
+      onChainApproval: approvalProof(fx.milestone.id),
+    });
     await expect(submit(fx.milestone.id, fx.contractor, 2)).rejects.toBeInstanceOf(DomainError);
   });
 
   it("records payout failure and keeps milestone recoverable", async () => {
     const fx = await seedFixture();
     const s1 = await submit(fx.milestone.id, fx.contractor, 1);
-    await decide({ submissionId: s1.submission.id, actor: fx.certifier, action: "approve", note: "" });
+    await decide({
+      submissionId: s1.submission.id,
+      actor: fx.certifier,
+      action: "approve",
+      note: "",
+      onChainApproval: approvalProof(fx.milestone.id),
+    });
     const result = await triggerPayout({
       milestoneId: fx.milestone.id,
       actor: fx.owner,

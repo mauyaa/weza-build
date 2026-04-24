@@ -1,0 +1,19 @@
+[package]
+name = "weza_approval"
+version = "0.1.0"
+description = "WEZA Build milestone approval PDA program"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "weza_approval"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.31.1"

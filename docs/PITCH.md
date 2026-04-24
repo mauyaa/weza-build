@@ -18,21 +18,21 @@ Target length: **2:45**. Delivered on camera, founder-to-judge tone. No flashy e
 
 ### 0:40 — 1:10 — the product in one sentence
 
-> "WEZA Build is an approval-to-payout platform for construction teams. Contractors submit drawings and evidence. Certifiers review, request revisions, and approve. Approval instantly unlocks payout. Owners click once, and the payment moves on Solana devnet with a permanent, auditable signature tied to that specific milestone."
+> "WEZA Build is an approval-to-payout platform for construction teams. Contractors submit drawings and evidence. Certifiers review, request revisions, and approve. Approval is recorded as a Solana transaction before payout unlocks. Owners click once, and the payment moves on Solana devnet with a permanent, auditable signature tied to that specific milestone."
 
 *(Cut to 20 seconds of screen recording — the full loop, speeded up 1.5x, captioned.)*
 
 ### 1:10 — 1:40 — why Solana
 
-> "We don't need a global ledger for every drawing — drawings stay in Supabase Storage. We need **one unforgeable receipt per approved payment**. Solana gives us that for a tenth of a cent. Every payout is a USDC transfer with a memo carrying the project code, milestone number, submission id, and approver id. A judge, an insurer, a lender can open Solana Explorer and reconstruct which real-world approval triggered that transfer."
+> "We don't need a global ledger for every drawing — drawings stay in Supabase Storage. We need **one unforgeable receipt for approval and one for payout**. Solana gives us that for a tenth of a cent. Approval is a structured Memo transaction; payout is a USDC transfer with memo context. A judge, insurer, or lender can open Solana Explorer and reconstruct which real-world approval unlocked the transfer."
 
 ### 1:40 — 2:10 — why us, why now
 
-> "I [team background — real answer]. We've already walked three contractor offices through the prototype; two have committed to running a live project on the platform next month. Construction is the largest industry still using email and signed PDFs for payment control. There's a reason RWA capital is flowing into Solana — 141 percent growth in 2025 — and this is the layer nobody's built yet."
+> "I [team background — real answer]. The next step is three Nairobi operator interviews and one live milestone pilot; the repo includes the exact script and evidence log so we do not fake traction. Construction is one of the largest industries still using email and signed PDFs for payment control. That's the trust layer Solana can make portable."
 
 ### 2:10 — 2:35 — traction + ask
 
-> "Today: deployed on Supabase and Solana devnet, full approval-to-payout loop, real USDC moving, audit trail linking every tx signature to a specific milestone. Next: two live pilots in Nairobi, one in Accra. We're applying to the Colosseum accelerator to run those pilots and bring the first stablecoin-settled construction milestones to production."
+> "Today: deployed on Supabase and Solana devnet, full approval-to-payout loop, approval proof before payout, devnet USDC moving, audit trail linking every tx signature to a specific milestone. Next: Nairobi interviews, one live milestone pilot, then a mainnet USDC/off-ramp partner. We're applying to the Colosseum accelerator to turn the working loop into a production wedge."
 
 ### 2:35 — 2:45 — close
 
@@ -60,11 +60,11 @@ Target length: **2:30**. Screen-only. Founder narrating off-camera. Every action
 
 ### 0:40 — 1:10
 
-"Certifier requests revision. Contractor resubmits v2. Certifier approves. Three audit rows land atomically in one Postgres transaction: submission approved, milestone approved, payout ready. The handoff pill now points at the owner."
+"Certifier requests revision. Contractor resubmits v2. Certifier approves. First, WEZA records a Solana approval Memo transaction with the milestone metadata. Only after that proof exists do the database rows move to submission approved, milestone approved, payout ready. The handoff pill now points at the owner."
 
 ### 1:10 — 1:50
 
-"Owner clicks Trigger payout · 120,000 USDC. Server-side, we lock the payout row in a `SELECT FOR UPDATE`, build a Solana transaction with two instructions — a Memo Program instruction carrying the JSON metadata, and a `TransferChecked` from the treasury's USDC ATA to the contractor's USDC ATA — and send it to devnet via Helius. We wait for confirmed commitment."
+"Owner clicks Trigger payout · 120,000 USDC. Server-side, we first verify the approval signature exists. Then we lock the payout row in a `SELECT FOR UPDATE`, build a Solana transaction with two instructions — a Memo Program instruction carrying the JSON metadata, and a `TransferChecked` from the treasury's USDC ATA to the contractor's USDC ATA — and send it to devnet via Helius. We wait for confirmed commitment."
 
 ### 1:50 — 2:15
 
@@ -80,10 +80,10 @@ Target length: **2:30**. Screen-only. Founder narrating off-camera. Every action
 
 ## Talking points for Q&A
 
-- **"Why not an Anchor program?"** — A custom program increases attack surface with no judge-visible upside. The Memo + TransferChecked pair is auditable, trivially indexable, and works with any Solana indexer today. We would add an Anchor program for escrow + on-chain arbitration in the next milestone, not for the hackathon submission.
+- **"Why not only Anchor?"** — The shipped proof path is a real Solana Memo transaction judges can inspect today. The repo includes a minimal Anchor approval program as the next custom-program path, but the live demo prioritizes a reliable, indexable proof over a half-deployed program.
 - **"What about mainnet USDC?"** — Trivial to flip: one env var (`SOLANA_RPC_URL`, `SOLANA_CLUSTER=mainnet`) and swap the USDC mint constant. Devnet is the correct hackathon target. We deliberately avoid making mainnet claims we haven't earned.
 - **"Escrow?"** — Not in scope. The current design assumes the owner funds the treasury. A follow-on Anchor program can pull owner funds at approval time. We chose not to ship half-implemented escrow.
-- **"Who signs the memo?"** — The treasury keypair signs the whole transaction. The memo is authenticated by being inside a treasury-signed tx. The `approved_by` field inside the memo is the certifier's Supabase user id — the audit log row proves the certifier made the approval; the on-chain tx proves the owner acted on it.
+- **"Who signs the memo?"** — The treasury keypair signs the on-chain approval and payout transactions. The `certifier` / `approved_by` fields tie the transaction to the certifier's Supabase identity; the audit log proves the certifier action, and Solana proves WEZA cannot quietly rewrite the approval/payout timeline later.
 - **"KYC?"** — Deliberately out. WEZA Build is a workflow + payout rail, not a money services business. Compliance plugs in at the treasury funding layer, not inside the product.
 
 ---
@@ -98,7 +98,7 @@ Target length: **2:30**. Screen-only. Founder narrating off-camera. Every action
 - 64% of subcontractors regularly face slow pay
 - 75% front material costs out of own cash
 - 56% have turned down work over cash-flow risk
-- RWAs on Solana grew 141% in 2025; > $24B TVL by mid-2025
+- Kenya national government pending bills reached Sh524B by Dec 2024, with contractor development-project debt around Sh243.19B (Eastleigh Voice, 2025)
 
 ## What *not* to say
 

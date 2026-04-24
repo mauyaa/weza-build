@@ -13,6 +13,14 @@ Throughout this script, `BASE` is that URL.
 ## 1. Health check — Solana treasury
 
 ```bash
+curl -s "$BASE/api/health/config" | jq
+```
+
+**Pass:** `success: true`, `data.supabase.ready == true`, `data.database_url == true`, and `data.service_role == true`.
+
+**Fail:** any missing field means login/seed/server writes can fail even if `/about` renders.
+
+```bash
 curl -s "$BASE/api/health/solana" | jq
 ```
 
@@ -130,7 +138,7 @@ In your Vercel deployment **Settings → Environment Variables**, set `WEZA_MOCK
 
 **Pass:** returns `mode: "live"` (the env loader refuses mock in production). If it returns `mode: "mock"` in production, escalate — a newer branch has broken the guard.
 
-Remove the var again after the test.
+Remove the var again after the test. Production must stay `mode: "live"` the entire time; mock mode is local-only.
 
 ---
 
