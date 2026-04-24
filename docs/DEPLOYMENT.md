@@ -118,7 +118,9 @@ The seed script:
 
 ## 7. Post-deploy verification
 
-Open `https://YOUR-DEPLOY.vercel.app/api/health/solana`. You should see:
+Open `https://YOUR-DEPLOY.vercel.app/api/health/config`. You should see `success: true`, every required env value present, `supabaseServerReady: true`, `database.connected: true`, and `database.missingTables: []`.
+
+Then open `https://YOUR-DEPLOY.vercel.app/api/health/solana`. You should see:
 
 ```json
 {
