@@ -4,6 +4,8 @@
 
 WEZA Build turns construction milestone approval into a tracked workflow that moves directly into a real payout on Solana devnet. Drawings and revisions live off-chain; the payout moment is the on-chain moment.
 
+**Live deployment:** [https://weza-build.vercel.app](https://weza-build.vercel.app)
+
 ## What it does
 
 One loop, end to end:
