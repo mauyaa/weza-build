@@ -8,6 +8,7 @@ const actionLabel: Record<AuditLog["action"], { label: string; tone: string }> =
   "submission.revision_requested": { label: "Revision requested", tone: "text-amber-700 bg-amber-50 border-amber-200" },
   "submission.approved": { label: "Approved", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" },
   "submission.rejected": { label: "Rejected", tone: "text-red-700 bg-red-50 border-red-200" },
+  "approval.recorded_onchain": { label: "On-chain approval", tone: "text-violet-700 bg-violet-50 border-violet-200" },
   "milestone.approved": { label: "Milestone approved", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" },
   "milestone.payout_ready": { label: "Payout ready", tone: "text-amber-700 bg-amber-50 border-amber-200" },
   "payout.triggered": { label: "Payout triggered", tone: "text-violet-700 bg-violet-50 border-violet-200" },

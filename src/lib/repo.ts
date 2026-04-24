@@ -56,6 +56,18 @@ async function firstTx<T extends object>(
   return res.rows[0] ?? null;
 }
 
+async function optionalColumnExists(table: string, column: string): Promise<boolean> {
+  const res = await query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1
+       FROM information_schema.columns
+       WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2
+     ) AS exists`,
+    [table, column]
+  );
+  return Boolean(res.rows[0]?.exists);
+}
+
 async function manyTx<T extends object>(
   client: DbClientLike,
   sql: string,
@@ -66,10 +78,6 @@ async function manyTx<T extends object>(
 }
 
 // -- Lookups ---------------------------------------------------------------
-
-export async function getProfileByEmail(email: string): Promise<Profile | null> {
-  return first<Profile>("SELECT * FROM profiles WHERE email = $1", [email]);
-}
 
 export async function getProfile(id: string): Promise<Profile | null> {
   return first<Profile>("SELECT * FROM profiles WHERE id = $1", [id]);
@@ -137,6 +145,10 @@ export async function getSubmissionForMilestone(milestoneId: string): Promise<Su
   return first<Submission>("SELECT * FROM submissions WHERE milestone_id = $1", [milestoneId]);
 }
 
+export async function getSubmission(id: string): Promise<Submission | null> {
+  return first<Submission>("SELECT * FROM submissions WHERE id = $1", [id]);
+}
+
 export async function listVersions(submissionId: string): Promise<SubmissionVersion[]> {
   return many<SubmissionVersion>(
     "SELECT * FROM submission_versions WHERE submission_id = $1 ORDER BY version ASC",
@@ -180,6 +192,13 @@ export async function getLatestPayout(milestoneId: string): Promise<PayoutInstru
   return first<PayoutInstruction>(
     "SELECT * FROM payout_instructions WHERE milestone_id = $1 ORDER BY created_at DESC LIMIT 1",
     [milestoneId]
+  );
+}
+
+export async function getLatestApproval(submissionId: string): Promise<ApprovalDecision | null> {
+  return first<ApprovalDecision>(
+    "SELECT * FROM approval_decisions WHERE submission_id = $1 AND action = 'approve' ORDER BY created_at DESC LIMIT 1",
+    [submissionId]
   );
 }
 
@@ -228,7 +247,14 @@ async function transitionMilestone(
   client: DbClientLike,
   milestoneId: string,
   next: MilestoneStatus,
-  extra: { payout_status?: PayoutStatus; payout_tx_signature?: string | null; payout_triggered_at?: string | null } = {}
+  extra: {
+    payout_status?: PayoutStatus;
+    payout_tx_signature?: string | null;
+    payout_triggered_at?: string | null;
+    approval_tx_signature?: string | null;
+    approval_pda?: string | null;
+    approval_network?: string | null;
+  } = {}
 ): Promise<Milestone> {
   const current = await firstTx<Milestone>(client, "SELECT * FROM milestones WHERE id = $1 FOR UPDATE", [milestoneId]);
   if (!current) throw new DomainError("not_found", "Milestone not found", 404);
@@ -244,7 +270,10 @@ async function transitionMilestone(
        status = $2,
        payout_status = COALESCE($3, payout_status),
        payout_tx_signature = COALESCE($4, payout_tx_signature),
-       payout_triggered_at = COALESCE($5, payout_triggered_at)
+       payout_triggered_at = COALESCE($5, payout_triggered_at),
+       approval_tx_signature = COALESCE($6, approval_tx_signature),
+       approval_pda = COALESCE($7, approval_pda),
+       approval_network = COALESCE($8, approval_network)
      WHERE id = $1
      RETURNING *`,
     [
@@ -253,6 +282,9 @@ async function transitionMilestone(
       extra.payout_status ?? null,
       extra.payout_tx_signature ?? null,
       extra.payout_triggered_at ?? null,
+      extra.approval_tx_signature ?? null,
+      extra.approval_pda ?? null,
+      extra.approval_network ?? null,
     ]
   );
   return res.rows[0];
@@ -500,6 +532,7 @@ export interface DecideInput {
   actor: Profile;
   action: ApprovalAction;
   note: string;
+  onChainApproval?: OnChainApprovalProof | null;
 }
 
 export interface DecideResult {
@@ -508,6 +541,13 @@ export interface DecideResult {
   milestone: Milestone;
   payout: PayoutInstruction | null;
   audit: AuditLog[];
+}
+
+export interface OnChainApprovalProof {
+  txSignature: string;
+  approvalPda: string;
+  network: string;
+  recordedAt?: string | null;
 }
 
 export async function decide(input: DecideInput): Promise<DecideResult> {
@@ -546,10 +586,32 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
 
   return withTx(async (client) => {
     const audits: AuditLog[] = [];
+    if (input.action === "approve" && !input.onChainApproval) {
+      throw new DomainError(
+        "approval_not_onchain",
+        "A Solana approval transaction is required before payout can unlock",
+        409
+      );
+    }
+    const proof = input.onChainApproval ?? null;
     const decRes = await client.query<ApprovalDecision>(
-      `INSERT INTO approval_decisions (submission_id, version, certifier_id, action, note)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [sub.id, sub.current_version, input.actor.id, input.action, input.note.trim()]
+      `INSERT INTO approval_decisions
+         (submission_id, version, certifier_id, action, note,
+          approval_tx_signature, approval_pda, approval_network, approval_recorded_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
+               CASE WHEN $9::timestamptz IS NULL AND $6::text IS NULL THEN NULL ELSE COALESCE($9::timestamptz, now()) END)
+       RETURNING *`,
+      [
+        sub.id,
+        sub.current_version,
+        input.actor.id,
+        input.action,
+        input.note.trim(),
+        proof?.txSignature ?? null,
+        proof?.approvalPda ?? null,
+        proof?.network ?? null,
+        proof?.recordedAt ?? null,
+      ]
     );
     const decision = decRes.rows[0];
     let payout: PayoutInstruction | null = null;
@@ -569,7 +631,12 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
       );
     } else if (input.action === "approve") {
       await transitionSubmission(client, sub.id, "approved");
-      await transitionMilestone(client, milestone.id, "approved", { payout_status: "ready" });
+      await transitionMilestone(client, milestone.id, "approved", {
+        payout_status: "ready",
+        approval_tx_signature: proof!.txSignature,
+        approval_pda: proof!.approvalPda,
+        approval_network: proof!.network,
+      });
       const contractor = (await firstTx<Profile>(
         client,
         "SELECT * FROM profiles WHERE id = $1",
@@ -589,6 +656,18 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
         [milestone.id, milestone.payout_amount_usdc, contractor.wallet_address]
       );
       payout = payoutRes.rows[0];
+      audits.push(
+        await writeAuditTx(client, {
+          orgId: project.org_id,
+          projectId: project.id,
+          milestoneId: milestone.id,
+          submissionId: sub.id,
+          actor: input.actor,
+          action: "approval.recorded_onchain",
+          message: `On-chain approval recorded at ${proof!.approvalPda}`,
+          txSignature: proof!.txSignature,
+        })
+      );
       audits.push(
         await writeAuditTx(client, {
           orgId: project.org_id,
@@ -700,6 +779,13 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
     throw new DomainError(
       "milestone_not_approved",
       "Milestone must be approved before payout",
+      409
+    );
+  }
+  if (!milestone.approval_tx_signature || !milestone.approval_pda) {
+    throw new DomainError(
+      "approval_not_onchain",
+      "Milestone payout is locked until the certifier approval is recorded on Solana",
       409
     );
   }

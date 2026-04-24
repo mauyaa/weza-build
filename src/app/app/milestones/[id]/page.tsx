@@ -22,6 +22,8 @@ import { CommentThread } from "@/components/comment-thread";
 import { LiveMilestoneAudit } from "@/components/live-audit";
 import { HandoffPill } from "@/components/handoff-pill";
 
+export const dynamic = "force-dynamic";
+
 export default async function MilestonePage({ params }: { params: { id: string } }) {
   const profile = (await getCurrentProfile())!;
   const milestone = await getMilestone(params.id);
@@ -107,6 +109,14 @@ export default async function MilestonePage({ params }: { params: { id: string }
           </div>
         </div>
       </div>
+
+      {milestone.approval_tx_signature && (
+        <OnChainApprovalBanner
+          signature={milestone.approval_tx_signature}
+          pda={milestone.approval_pda}
+          network={milestone.approval_network}
+        />
+      )}
 
       {milestone.status === "settled" && milestone.payout_tx_signature && (
         <SettledBanner signature={milestone.payout_tx_signature} amount={milestone.payout_amount_usdc} />
@@ -195,6 +205,37 @@ function SettledBanner({ signature, amount }: { signature: string; amount: numbe
         className="btn-brand shrink-0"
       >
         View on Explorer
+      </a>
+    </div>
+  );
+}
+
+function OnChainApprovalBanner({
+  signature,
+  pda,
+  network,
+}: {
+  signature: string;
+  pda: string | null;
+  network: string | null;
+}) {
+  return (
+    <div className="card border-violet-200 bg-violet-50/70 p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div>
+        <div className="text-sm font-semibold text-violet-950">
+          Certifier approval recorded on {network ?? "solana-devnet"}
+        </div>
+        <div className="text-xs text-violet-900/75 mt-1">
+          Approval PDA <span className="mono">{shortSig(pda ?? undefined, 8)}</span> unlocks the payout queue.
+        </div>
+      </div>
+      <a
+        href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+        target="_blank"
+        rel="noreferrer"
+        className="btn-ghost bg-white"
+      >
+        View approval tx
       </a>
     </div>
   );

@@ -1,8 +1,8 @@
 # WEZA Build
 
-**Approval-to-payout platform for construction teams.**
+**Approval-to-payout infrastructure for East African construction teams.**
 
-WEZA Build turns construction milestone approval into a tracked workflow that moves directly into a real payout on Solana devnet. Drawings and revisions live off-chain; the payout moment is the on-chain moment.
+WEZA Build turns construction milestone approval into a tracked workflow where the certifier's approval is recorded on Solana before payout can unlock. It is built for Nairobi and East African construction markets where subcontractors often operate across WhatsApp, PDFs, delayed bank rails, and weak dispute evidence.
 
 **Live deployment:** [https://weza-build.vercel.app](https://weza-build.vercel.app)
 
@@ -15,10 +15,11 @@ submit drawing / evidence
   → certifier review
   → request revision (optional)
   → resubmit new version
+  → certifier approval recorded on Solana
   → milestone approved
   → owner triggers payout
   → Solana devnet transaction runs
-  → tx signature stored in audit trail
+  → approval + payout signatures stored in audit trail
 ```
 
 Three roles that see only what they need:
@@ -34,9 +35,17 @@ Three roles that see only what they need:
 - Not an AI product.
 - Not a marketplace, mobile app, or generic wallet.
 
+## Why Nairobi / East Africa
+
+Construction is a trust problem before it is a payment problem. Kenya's construction sector contributes roughly 6-7% of GDP, while the wider region relies on contractor networks that still settle around paper certificates, bank delays, and informal dispute records. Global construction payment surveys consistently show most contractors wait 30+ days past due; in emerging markets that delay is amplified by fragmented banking, FX, and owner-contractor information asymmetry.
+
+WEZA is designed for a contractor in Nairobi who needs a portable proof packet: the file hash, certifier sign-off, approval transaction, payout transaction, and project audit trail in one place.
+
 ## Why Solana
 
-Construction payouts need durable public proof. WEZA Build runs that moment on Solana devnet and stores the transaction signature in the audit trail. Drawings, comments, and revision history stay off-chain — they do not belong on a public ledger.
+Construction payouts need durable public proof that does not depend on trusting the platform operator. WEZA Build records the milestone approval as an on-chain approval PDA, then only unlocks payout after that approval proof exists. The payout transaction carries the project, milestone, submission, and approver context in a memo.
+
+Drawings, comments, and revision history stay off-chain in Supabase Storage and Postgres because they may contain private commercial data. Solana stores the tamper-proof approval and settlement evidence a contractor can show to an arbitrator, bank, donor, or owner.
 
 ## Stack
 
@@ -46,6 +55,7 @@ Construction payouts need durable public proof. WEZA Build runs that moment on S
 - **Supabase Storage** (private `submissions` bucket, short-lived signed URLs)
 - **Row-Level Security** on every user-facing table; all writes flow through server route handlers using the service-role key
 - **Solana devnet** via `@solana/web3.js` with a pre-funded treasury keypair
+- **Minimal Anchor approval program** in `programs/weza_approval` for the milestone approval PDA
 - **Vitest** + `pglite` for in-process Postgres testing
 
 ## Local development
@@ -62,7 +72,9 @@ npm run dev
 
 Then open <http://localhost:3000> and sign in with `owner@weza.build` / `weza1234`.
 
-For offline development without a devnet treasury, set `WEZA_MOCK_SOLANA=1`. **This flag is ignored in production** — the env loader refuses to honour it when `NODE_ENV=production`.
+For offline development without a devnet treasury or deployed approval program, set `WEZA_MOCK_SOLANA=1`. **This flag is ignored in production** — the env loader refuses to honour it when `NODE_ENV=production`.
+
+Devnet USDC is a hackathon configuration. Mainnet USDC through Circle or a local off-ramp partner changes the mint, RPC/cluster, treasury, and compliance wrapper; it does not require a product re-architecture.
 
 ## Tests
 
@@ -74,6 +86,7 @@ Runs against an in-process Postgres (pglite, WASM) so no Docker is required. Cov
 
 - submission / milestone / payout state machine transitions
 - full submit → revise → resubmit → approve → payout loop
+- on-chain approval proof is required before payout can unlock
 - duplicate approve + duplicate payout idempotency (no re-broadcast)
 - role enforcement (contractor cannot trigger a payout)
 - payout failure + retry (milestone recoverable)

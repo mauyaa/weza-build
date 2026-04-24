@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { setDbDriver, type DbDriver, type DbClientLike } from "../src/lib/db";
 import type { Milestone, Profile, Project } from "../src/lib/types";
+import type { OnChainApprovalProof } from "../src/lib/repo";
 
 let pg: PGlite | null = null;
 
@@ -102,4 +103,13 @@ export async function seedFixture(): Promise<Fixture> {
   ).rows[0];
 
   return { org_id: orgId, owner, certifier, contractor, project, milestone };
+}
+
+export function approvalProof(milestoneId: string): OnChainApprovalProof {
+  return {
+    txSignature: `APPROVAL_SIG_${crypto.randomBytes(8).toString("hex")}`,
+    approvalPda: `approval_pda_${milestoneId}`,
+    network: "solana-devnet",
+    recordedAt: new Date().toISOString(),
+  };
 }

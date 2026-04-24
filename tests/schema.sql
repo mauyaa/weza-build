@@ -42,6 +42,9 @@ create table if not exists milestones (
     check (status in ('awaiting_submission','under_review','approved','disputed','payout_triggered','settled')),
   payout_status text not null default 'not_ready'
     check (payout_status in ('not_ready','ready','triggered','confirmed','failed','held')),
+  approval_tx_signature text,
+  approval_pda text,
+  approval_network text,
   payout_tx_signature text,
   payout_triggered_at timestamptz,
   due_date date,
@@ -91,6 +94,10 @@ create table if not exists approval_decisions (
   certifier_id uuid not null references profiles(id),
   action text not null check (action in ('request_revision','approve','reject')),
   note text not null default '',
+  approval_tx_signature text,
+  approval_pda text,
+  approval_network text,
+  approval_recorded_at timestamptz,
   created_at timestamptz not null default now()
 );
 

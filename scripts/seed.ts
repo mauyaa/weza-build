@@ -18,6 +18,7 @@ import crypto from "node:crypto";
 import { closePool, query, withTx } from "../src/lib/db";
 import { supabaseService } from "../src/lib/supabase-service";
 import { addComment, decide, submitPackage, writeAudit } from "../src/lib/repo";
+import { approvalPda } from "../src/lib/solana-approval";
 import type { Profile } from "../src/lib/types";
 
 const ALL_EMAILS = [
@@ -129,6 +130,20 @@ async function main() {
      VALUES ($1, 1, 'Site clearance photo log', 'Final cleared site with benchmark pegs', 'NMT-site-clearance-v1.pdf', $2, 2430112, $3)`,
     [subA, sha256("NMT-site-clearance-v1"), contractorId]
   );
+  const approvalSigA = "DEMO_APPROVAL_" + crypto.randomBytes(24).toString("base64url");
+  await query(
+    `UPDATE milestones
+       SET approval_tx_signature = $2, approval_pda = $3, approval_network = 'solana-devnet'
+     WHERE id = $1`,
+    [m1a, approvalSigA, approvalPda(m1a)]
+  );
+  await query(
+    `INSERT INTO approval_decisions
+       (submission_id, version, certifier_id, action, note,
+        approval_tx_signature, approval_pda, approval_network, approval_recorded_at)
+     VALUES ($1, 1, $2, 'approve', 'Accepted on seed.', $3, $4, 'solana-devnet', now())`,
+    [subA, certifierId, approvalSigA, approvalPda(m1a)]
+  );
   await query(
     `INSERT INTO payout_instructions (milestone_id, amount_usdc, recipient_wallet, status, tx_signature, network, triggered_by, triggered_at, confirmed_at)
      VALUES ($1, 48000, $2, 'confirmed', $3, 'solana-devnet', $4, now(), now())`,
@@ -136,6 +151,12 @@ async function main() {
   );
   for (const ev of [
     { actor: contractor, action: "submission.submitted", message: "Submitted v1: Site clearance photo log" },
+    {
+      actor: certifier,
+      action: "approval.recorded_onchain",
+      message: `On-chain approval recorded at ${approvalPda(m1a)}`,
+      txSignature: approvalSigA,
+    },
     { actor: certifier, action: "submission.approved", message: "Approved v1" },
     { actor: certifier, action: "milestone.approved", message: "Milestone Site clearance & setting out approved" },
     { actor: certifier, action: "milestone.payout_ready", message: "Payout ready: 48000.00 USDC" },
@@ -226,6 +247,12 @@ async function main() {
     actor: certifier,
     action: "approve",
     note: "Cube tests pass; slab accepted.",
+    onChainApproval: {
+      txSignature: "DEMO_APPROVAL_" + crypto.randomBytes(24).toString("base64url"),
+      approvalPda: approvalPda(m1c),
+      network: "solana-devnet",
+      recordedAt: new Date().toISOString(),
+    },
   });
 
   // Milestone D: awaiting submission.

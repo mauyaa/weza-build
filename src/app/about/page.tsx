@@ -33,10 +33,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="max-w-3xl">
             <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight">
-              Approval-to-payout<br />for construction.
+              On-chain milestone approval<br />for African construction.
             </h1>
             <p className="mt-6 text-lg text-ink-600 leading-relaxed">
-              Drawings, revisions, and milestone sign-off move directly into payout — on Solana devnet, with a permanent audit trail. Workflow stays off-chain. Payment proof happens on-chain.
+              Nairobi contractors often wait 30–90 days after work is certified, while paper approvals vanish into email, WhatsApp, and bank queues. WEZA Build turns each certified construction milestone into a public Solana approval record before payout can unlock.
             </p>
             <div className="mt-10 flex gap-3">
               <Link href="/signup" className="btn-primary">Create an account</Link>
@@ -48,15 +48,15 @@ export default function AboutPage() {
 
       <section className="border-b border-ink-200 bg-ink-50">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">The real bottleneck</h2>
+          <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">East African payment trust gap</h2>
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Stat big="$299B" small="slow-payment cost to US construction, 2025" />
-            <Stat big="14%" small="hidden tax on project costs" />
-            <Stat big="82%" small="of contractors wait 30+ days past due" />
-            <Stat big="5%" small="of subcontractors get paid on time" />
+            <Stat big="30–90d" small="common contractor payment delay after approval" />
+            <Stat big="40%" small="of Sub-Saharan African firms identify finance as a major constraint (World Bank)" />
+            <Stat big="KES" small="local contracts, dollar-linked materials, thin cash buffers" />
+            <Stat big="24/7" small="public audit evidence outside any one operator" />
           </div>
           <p className="mt-8 text-ink-600 max-w-2xl leading-relaxed">
-            It isn&rsquo;t banking. It&rsquo;s workflow. Approvals sit in email and WhatsApp; the payment waits on paperwork that never lands. WEZA Build gives the approval a queue, a state machine, a certifier&rsquo;s signature, and a one-click payout the moment the milestone is approved.
+            The problem is counterparty trust before it is payment rails. WEZA gives owners, certifiers, contractors, lenders, donors, and arbitrators a shared record: the exact package submitted, the certifier&rsquo;s approval transaction, and the USDC payout proof.
           </p>
         </div>
       </section>
@@ -65,9 +65,9 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">The loop</h2>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <LoopCard title="Contractor submits" body="Drawing or evidence package lands with a note, file, sha256 — and an audit row." tone="blue" />
-            <LoopCard title="Certifier decides" body="Request revision, reject, or approve. Decisions are attached to the exact version they reviewed." tone="violet" />
-            <LoopCard title="Owner pays out" body="One click moves devnet USDC with a memo tying the tx to project, milestone, submission, and approver." tone="green" />
+            <LoopCard title="Contractor submits" body="Drawing or evidence package lands with version, file hash, and private storage pointer." tone="blue" />
+            <LoopCard title="Certifier signs on-chain" body="Approval records a milestone PDA; payout cannot become ready without that Solana proof." tone="violet" />
+            <LoopCard title="Owner pays out" body="One click moves devnet USDC and links the transfer to the approval record." tone="green" />
           </div>
         </div>
       </section>
@@ -77,10 +77,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">Open the chain</h2>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              This deploy runs a real Solana devnet treasury. The balance and address below are pulled live from our RPC — click through to Solana Explorer and verify the mint address, the ATA, and every payout signature we&rsquo;ve ever broadcast.
+              This deploy makes Solana load-bearing: certifier approval is recorded first, then payout unlocks. The treasury balance and address below are pulled live from RPC — click through to Solana Explorer and verify the mint, ATA, approval, and payout signatures.
             </p>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              Every payout is a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> paired with a Memo Program instruction. The memo carries project code, milestone number, submission id, and approver id, so any auditor can reconstruct which real-world approval caused the transfer.
+              The hackathon build ships a minimal Anchor milestone-approval program design and a devnet proof path. Payout remains a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with structured memo context, so any auditor can reconstruct which real-world approval caused the transfer.
             </p>
           </div>
           <TreasuryStatus />
@@ -92,10 +92,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">Why Solana</h2>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              Every payout is a USDC <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with a Memo Program instruction carrying the off-chain context (project, milestone, submission, approver). Sub-cent fees, sub-second confirmation, readable on any Solana explorer.
+              In low-trust construction markets, the differentiator is not just cheap payment. It is a permanent, public audit trail a Nairobi contractor can show a dispute board, bank, donor, or main contractor without trusting WEZA as the operator.
             </p>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              Drawings and revisions stay off-chain in Supabase Storage — they don&rsquo;t belong on a public ledger.
+              Drawings and revisions stay off-chain in Supabase Storage; hashes, approvals, and payout signatures are the public proof layer. Moving from devnet USDC to mainnet USDC is a treasury/RPC/mint configuration swap, not a workflow rewrite.
             </p>
           </div>
           <div>
@@ -103,7 +103,7 @@ export default function AboutPage() {
             <ul className="mt-4 space-y-2 text-ink-700">
               <li>— Not a bank rail. Not escrow. Not custody.</li>
               <li>— Not AI, not web4, not a marketplace.</li>
-              <li>— Not mainnet today. Devnet USDC, by design.</li>
+              <li>— Not mainnet today. Devnet USDC now; mainnet USDC is a config swap with the right treasury and off-ramp partner.</li>
               <li>— Not an everything-app. One loop, done well.</li>
             </ul>
           </div>

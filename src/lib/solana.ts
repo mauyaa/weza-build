@@ -97,8 +97,18 @@ function connection(): Connection {
   return _conn;
 }
 
-function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: TransactionInstruction; memo: string } {
-  const memo = JSON.stringify({
+export function getSolanaConnection(): Connection {
+  return connection();
+}
+
+export function loadSolanaTreasury(): Keypair {
+  return loadTreasury();
+}
+
+export function buildMemoInstruction(
+  payload: OnChainPayoutArgs["memo"] | string
+): { ix: TransactionInstruction; memo: string } {
+  const memo = typeof payload === "string" ? payload : JSON.stringify({
     app: "weza-build",
     v: 1,
     project: payload.projectCode,
@@ -113,6 +123,13 @@ function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: Transac
     data: Buffer.from(memo, "utf8"),
   });
   return { ix, memo };
+}
+
+export async function sendTreasuryTransaction(...instructions: TransactionInstruction[]): Promise<string> {
+  const tx = new Transaction().add(...instructions);
+  return sendAndConfirmTransaction(connection(), tx, [loadTreasury()], {
+    commitment: "confirmed",
+  });
 }
 
 export interface TreasuryStatus {

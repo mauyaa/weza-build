@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ok } from "@/lib/api";
 import { handleDomain, requireSession } from "@/lib/guard";
 import { decide } from "@/lib/repo";
+import { recordMilestoneApprovalProof } from "@/lib/solana-approval";
 
 const schema = z.object({
   action: z.enum(["request_revision", "approve", "reject"]),
@@ -16,11 +17,19 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const parsed = schema.safeParse(body);
   if (!parsed.success) return handleDomain(new Error("Invalid decision"));
   try {
+    const onChainApproval =
+      parsed.data.action === "approve"
+        ? await recordMilestoneApprovalProof({
+            submissionId: params.id,
+            certifier: guard.profile,
+          })
+        : null;
     const result = await decide({
       submissionId: params.id,
       actor: guard.profile,
       action: parsed.data.action,
       note: parsed.data.note,
+      onChainApproval,
     });
     return ok(result, "Decision recorded", "decided");
   } catch (err) {

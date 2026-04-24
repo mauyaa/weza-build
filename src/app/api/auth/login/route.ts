@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { fail, ok } from "@/lib/api";
 import { supabaseServer } from "@/lib/supabase-server";
+import { DomainError } from "@/lib/repo";
 import { getProfile } from "@/lib/repo";
 
 const schema = z.object({
@@ -22,5 +23,12 @@ export async function POST(req: NextRequest) {
   if (error || !data.user) return fail("Invalid email or password", "invalid_credentials", 401);
 
   const profile = await getProfile(data.user.id);
+  if (!profile) {
+    return fail(
+      "Signed in, but no WEZA profile exists. Re-run the seed script or create the profile trigger in Supabase.",
+      "profile_missing",
+      409
+    );
+  }
   return ok({ profile });
 }

@@ -1,5 +1,6 @@
 import { fail, ok } from "@/lib/api";
 import { env } from "@/lib/env";
+import { approvalProgramStatus } from "@/lib/solana-approval";
 import { explorerAddress, treasuryStatus } from "@/lib/solana";
 
 export async function GET() {
@@ -13,9 +14,11 @@ export async function GET() {
   }
   try {
     const status = await treasuryStatus();
+    const approvalProgram = approvalProgramStatus();
     return ok({
       mode: "live",
       ...status,
+      approval_program: approvalProgram,
       treasury_explorer: explorerAddress(status.publicKey),
       usdc_ata_explorer: status.usdcAta ? explorerAddress(status.usdcAta) : null,
       usdc_mint_explorer: explorerAddress(status.usdcMint),

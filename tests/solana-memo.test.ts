@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { decide, submitPackage, triggerPayout } from "../src/lib/repo";
 import { sha256 } from "../src/lib/ids";
-import { seedFixture } from "./helpers";
+import { approvalProof, seedFixture } from "./helpers";
 
 describe("on-chain payout envelope", () => {
   it("passes project/milestone/submission metadata into runOnChain memo", async () => {
@@ -20,6 +20,7 @@ describe("on-chain payout envelope", () => {
       actor: fx.certifier,
       action: "approve",
       note: "",
+      onChainApproval: approvalProof(fx.milestone.id),
     });
 
     let captured: Parameters<Parameters<typeof triggerPayout>[0]["runOnChain"]>[0] | null = null;

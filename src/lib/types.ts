@@ -62,6 +62,9 @@ export interface Milestone {
   payout_amount_usdc: number;
   status: MilestoneStatus;
   payout_status: PayoutStatus;
+  approval_tx_signature: string | null;
+  approval_pda: string | null;
+  approval_network: string | null;
   payout_tx_signature: string | null;
   payout_triggered_at: string | null;
   due_date: string | null;
@@ -111,6 +114,10 @@ export interface ApprovalDecision {
   certifier_id: string;
   action: ApprovalAction;
   note: string;
+  approval_tx_signature: string | null;
+  approval_pda: string | null;
+  approval_network: string | null;
+  approval_recorded_at: string | null;
   created_at: string;
 }
 
@@ -136,6 +143,7 @@ export type AuditAction =
   | "submission.revision_requested"
   | "submission.approved"
   | "submission.rejected"
+  | "approval.recorded_onchain"
   | "milestone.approved"
   | "milestone.payout_ready"
   | "payout.triggered"
