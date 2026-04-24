@@ -11,6 +11,7 @@
 - Milestone + payout state machines enforced in DB `CHECK`, repo, and API.
 - **Real Solana devnet payout** via `@solana/web3.js` + pre-funded treasury keypair. Signature stored and surfaced in audit trail + Explorer link.
 - Idempotent approve and payout endpoints.
+- `GET /api/health/config` returning redacted runtime env + database readiness.
 - `GET /api/health/solana` returning treasury balance + cluster.
 - Live cross-role audit polling (`?since=`) with a soft flash on new rows and automatic page refresh on status transitions.
 - Searchable projects table with progress bar and role-aware next-action.
@@ -22,7 +23,7 @@
 - No real KYC / AML.
 - No AI, no web4 claims, no mobile app, no marketplace.
 - No on-chain storage of drawings, comments, revisions, or workflow state.
-- No Anchor program. The payout is a `SystemProgram.transfer` on devnet — sufficient for audit proof, minimal risk surface during a hackathon.
+- No Anchor program. The payout is a devnet USDC `TransferChecked` plus Memo transaction — sufficient for audit proof, minimal risk surface during a hackathon.
 
 ## Production guardrails
 
@@ -43,7 +44,7 @@
 npm install
 npm run db:migrate      # against a throwaway Supabase project or local Postgres
 npm run seed            # realistic construction projects + demo accounts
-npm test                # 13/13 pass against pglite
+npm test                # 14/14 pass against pglite
 npm run build           # clean
 npm start               # point env to the Supabase project
 ```

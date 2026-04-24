@@ -52,6 +52,8 @@ Every item here maps to a concrete action you take outside the codebase. Check t
 - [ ] Settings → Environment Variables — add every variable from `.env.example`:
     - [ ] `NEXT_PUBLIC_SUPABASE_URL`
     - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    - [ ] `SUPABASE_URL` (same value as `NEXT_PUBLIC_SUPABASE_URL`)
+    - [ ] `SUPABASE_ANON_KEY` (same value as `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
     - [ ] `SUPABASE_SERVICE_ROLE_KEY` (Encrypted)
     - [ ] `DATABASE_URL` (Encrypted)
     - [ ] `SOLANA_RPC_URL`
@@ -72,15 +74,16 @@ From your laptop, with the live envs loaded:
 
 Walk through `docs/SMOKE_TEST.md` end to end.
 
-- [ ] §1 `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
-- [ ] §2 signup creates auth user + profile.
-- [ ] §3 login succeeds, wrong password is rejected.
-- [ ] §4 full loop runs, produces a real 88-char base58 signature.
-- [ ] §4 Explorer view shows **Memo instruction** with JSON + **TransferChecked** for USDC mint `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`.
-- [ ] §4 idempotency — double-click returns same signature.
-- [ ] §5 RLS sanity — running as `authenticated` for a non-member returns no project rows.
-- [ ] §6 file download — member gets 302 + signed URL; non-member gets 403.
-- [ ] §7 production guardrail — setting `WEZA_MOCK_SOLANA=1` in Vercel and redeploying does NOT change `mode: live` to `mock`.
+- [ ] §1 `/api/health/config` returns `success: true`, no missing env, database connected, missingTables empty.
+- [ ] §2 `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
+- [ ] §3 signup creates auth user + profile.
+- [ ] §4 login succeeds, wrong password is rejected.
+- [ ] §5 full loop runs, produces a real 88-char base58 signature.
+- [ ] §5 Explorer view shows **Memo instruction** with JSON + **TransferChecked** for USDC mint `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`.
+- [ ] §5 idempotency — double-click returns same signature.
+- [ ] §6 RLS sanity — running as `authenticated` for a non-member returns no project rows.
+- [ ] §7 file download — member gets 302 + signed URL; non-member gets 403.
+- [ ] §8 production guardrail — setting `WEZA_MOCK_SOLANA=1` in Vercel and redeploying does NOT change `mode: live` to `mock`.
 
 ## 8 — Three real user interviews (~half a day)
 

@@ -77,7 +77,7 @@ Anything else we'd use Solana for would be overbuilding. Drawings and workflow s
 - Real **devnet USDC** payouts via `@solana/spl-token` `TransferChecked` + **Memo Program** carrying project code / milestone / submission id / approver id.
 - Funded treasury keypair (Circle faucet) on Helius devnet RPC.
 - Role-aware dashboards, live cross-role audit, workflow timeline, handoff pill, Settled banner linking to Solana Explorer.
-- 14/14 tests passing; `/api/health/solana` public health check.
+- 14/14 tests passing; `/api/health/config` and `/api/health/solana` public health checks.
 - Full deployment + smoke test docs.
 
 ## 9. Team
