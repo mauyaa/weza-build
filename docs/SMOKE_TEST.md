@@ -130,7 +130,7 @@ In your Vercel deployment **Settings → Environment Variables**, set `WEZA_MOCK
 
 **Pass:** returns `mode: "live"` (the env loader refuses mock in production). If it returns `mode: "mock"` in production, escalate — a newer branch has broken the guard.
 
-Remove the var again after the test.
+Remove the var again after the test. Production must stay `mode: "live"` the entire time; mock mode is local-only.
 
 ---
 

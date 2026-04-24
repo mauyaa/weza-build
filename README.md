@@ -15,7 +15,7 @@ submit drawing / evidence
   → certifier review
   → request revision (optional)
   → resubmit new version
-  → certifier approval recorded on Solana
+  → certifier approval proof recorded on Solana
   → milestone approved
   → owner triggers payout
   → Solana devnet transaction runs
@@ -43,7 +43,7 @@ WEZA is designed for a contractor in Nairobi who needs a portable proof packet: 
 
 ## Why Solana
 
-Construction payouts need durable public proof that does not depend on trusting the platform operator. WEZA Build records the milestone approval as an on-chain approval PDA, then only unlocks payout after that approval proof exists. The payout transaction carries the project, milestone, submission, and approver context in a memo.
+Construction payouts need durable public proof that does not depend on trusting the platform operator. WEZA Build records the milestone approval as a Solana transaction with structured milestone metadata, then only unlocks payout after that approval signature exists. The payout transaction carries the project, milestone, submission, and approver context in a memo.
 
 Drawings, comments, and revision history stay off-chain in Supabase Storage and Postgres because they may contain private commercial data. Solana stores the tamper-proof approval and settlement evidence a contractor can show to an arbitrator, bank, donor, or owner.
 
@@ -55,7 +55,7 @@ Drawings, comments, and revision history stay off-chain in Supabase Storage and 
 - **Supabase Storage** (private `submissions` bucket, short-lived signed URLs)
 - **Row-Level Security** on every user-facing table; all writes flow through server route handlers using the service-role key
 - **Solana devnet** via `@solana/web3.js` with a pre-funded treasury keypair
-- **Minimal Anchor approval program** in `programs/weza_approval` for the milestone approval PDA
+- **Minimal Anchor approval program source** in `programs/weza_approval` for the next custom-program approval path
 - **Vitest** + `pglite` for in-process Postgres testing
 
 ## Local development
@@ -72,7 +72,7 @@ npm run dev
 
 Then open <http://localhost:3000> and sign in with `owner@weza.build` / `weza1234`.
 
-For offline development without a devnet treasury or deployed approval program, set `WEZA_MOCK_SOLANA=1`. **This flag is ignored in production** — the env loader refuses to honour it when `NODE_ENV=production`.
+For offline development without a devnet treasury, set `WEZA_MOCK_SOLANA=1`. **This flag is ignored in production** — the env loader refuses to honour it when `NODE_ENV=production`.
 
 Devnet USDC is a hackathon configuration. Mainnet USDC through Circle or a local off-ramp partner changes the mint, RPC/cluster, treasury, and compliance wrapper; it does not require a product re-architecture.
 

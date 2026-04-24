@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { Keypair } from "@solana/web3.js";
-import { created } from "@/lib/api";
+import { created, fail } from "@/lib/api";
 import { handleDomain } from "@/lib/guard";
 import { supabaseServer } from "@/lib/supabase-server";
-import { supabaseService } from "@/lib/supabase-service";
 import { query } from "@/lib/db";
+import { env } from "@/lib/env";
 import { getProfile } from "@/lib/repo";
 
 const schema = z.object({
@@ -18,6 +18,10 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    if (!env.allowPublicSignup()) {
+      return fail("Public signup is disabled for this demo. Use the seeded judge accounts.", "signup_disabled", 403);
+    }
+
     const body = await req.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
@@ -50,6 +54,13 @@ export async function POST(req: NextRequest) {
     const profile = await getProfile(data.user.id);
     return created({ profile }, "Account created", "signed_up");
   } catch (err) {
+    if (err instanceof Error && err.message.includes("Supabase URL/anon key missing")) {
+      return fail(
+        "Signup service unavailable. The deployment is missing Supabase configuration.",
+        "auth_unavailable",
+        503
+      );
+    }
     return handleDomain(err);
   }
 }

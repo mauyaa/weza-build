@@ -1,27 +1,28 @@
 # Hackathon Canvas — WEZA Build
 
+Colosseum Frontier 2026 submission canvas.
+
 Colosseum's canvas format, filled in for judges. Keep answers tight.
 
 ## 1. Problem
 
-Construction payment is slow because **approval** is slow. Drawings and evidence sit in email and WhatsApp; certifiers have no queue; owners have no dashboard. The resulting delay is quantifiable:
+Construction payment is slow because **approval evidence** is weak. Drawings and evidence sit in email and WhatsApp; certifiers have no queue; owners have no dashboard; contractors have no portable proof when payment stalls.
 
-- $299 B annual cost to US construction in 2025 (BuildLedger / GlobeNewswire).
-- 14% hidden project tax.
-- 82% of contractors wait 30+ days past due.
-- Only 5% of subcontractors get paid on time.
-- 90-day average payment cycle vs 45-day healthy threshold.
-- Root cause cited by both GCs and subs: *lack of organized process* — not banking.
+- Nairobi contractors often face 30-90 day payment delays after work is certified.
+- Kenya public pending bills reached hundreds of billions of shillings; contractor development-project debt is a visible share of that pressure.
+- Sub-Saharan African firms consistently cite access to finance as a major operating constraint.
+- Global construction payment surveys show the same root cause: disorganized approval and payment processes, not just banking rails.
 
 ## 2. Solution
 
-An approval-to-payout platform. One screen per moment, one state machine, one audit trail, one devnet USDC payout per approved milestone.
+An approval-to-payout platform. One screen per moment, one state machine, one audit trail, one Solana approval proof, one devnet USDC payout per approved milestone.
 
 ```
 submit drawing/evidence
   → certifier review
   → request revision or approve
   → resubmit
+  → Solana approval proof recorded
   → milestone approved
   → owner triggers payout
   → devnet USDC transfer + memo with milestone metadata
@@ -38,9 +39,9 @@ submit drawing/evidence
 
 ## 4. Market
 
-- $1.8 T US construction industry.
-- RWAs on Solana grew **141% in 2025**, > $24 B TVL by mid-2025.
-- Beachhead market: African and Gulf construction firms already using USDC informally for cross-border material payments. Supabase / Vercel reach + Solana fee structure make this the first place the unit economics work.
+- Beachhead: Nairobi and East African construction teams dealing with delayed certification, pending bills, FX-linked materials, and weak dispute evidence.
+- Expansion: African and Gulf construction firms already comfortable with dollar-linked procurement and cross-border payment complexity.
+- Solana wedge: a public approval and payout trail that can be shown to owners, banks, donors, arbitrators, and off-ramp partners without trusting WEZA.
 
 ## 5. Business model (post-hackathon)
 
@@ -61,29 +62,30 @@ We're not "another payments app." We're the workflow tool that happens to settle
 
 ## 7. Why Solana
 
-- Sub-cent per payout (USDC `TransferChecked` + Memo ≈ 5000 lamports).
-- Sub-second confirmation via Helius / QuickNode devnet RPC.
-- Solana Pay / Memo program already standard for structured receipts.
+- Public approval evidence: certifier sign-off is a Solana Memo transaction before payout can unlock.
+- Public payout evidence: USDC `TransferChecked` + structured memo ties the transfer to the approved milestone.
+- Sub-cent fees and fast confirmation make the audit trail practical for thin-margin contractors.
 - RWA momentum: Circle devnet USDC is a real thing, not a toy token.
 
-Anything else we'd use Solana for would be overbuilding. Drawings and workflow stay off-chain where they belong.
+Drawings and workflow stay off-chain where they belong; approval and payout proofs are the public trust layer.
 
 ## 8. Current state (submission day)
 
 - Next.js 14 App Router deployed on Vercel.
-- Supabase Postgres with 3 SQL migrations, RLS on every user-facing table.
+- Supabase Postgres with SQL migrations, RLS on every user-facing table.
 - Supabase Auth (email + password) with `handle_new_user` trigger.
 - Supabase Storage private bucket with short-lived signed URLs.
+- Solana approval proof transaction before payout unlocks.
 - Real **devnet USDC** payouts via `@solana/spl-token` `TransferChecked` + **Memo Program** carrying project code / milestone / submission id / approver id.
 - Funded treasury keypair (Circle faucet) on Helius devnet RPC.
 - Role-aware dashboards, live cross-role audit, workflow timeline, handoff pill, Settled banner linking to Solana Explorer.
-- 14/14 tests passing; `/api/health/solana` public health check.
+- 15-test suite; `/api/health/solana` public health check.
 - Full deployment + smoke test docs.
 
 ## 9. Team
 
-- *Founder / engineer* — [real bio]. Prior work in [relevant]. Why this problem: [one honest sentence].
-- Advisors: [list or omit honestly].
+- Founder-led build: full-stack product, Supabase backend, Solana transaction flow, and deployment are implemented in this repo.
+- Add the founder bio, prior domain edge, and any real advisors in the submission form. Do not leave placeholders in the final canvas.
 
 ## 10. 90-day plan after Colosseum
 

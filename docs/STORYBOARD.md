@@ -19,13 +19,13 @@ Record on a clean neutral background. No slides, no screen share. Founder-to-cam
 |---|---|---|---|---|
 | 1 | 0:00–0:05 | Wide on you, eye contact. | "I'm [NAME]. I'm building WEZA Build." | 5 words of identification. Nothing else. |
 | 2 | 0:05–0:15 | Same. | "Construction payments are the dirtiest corner of a 1.8 trillion-dollar industry." | Slow down on the number. |
-| 3 | 0:15–0:35 | Title card overlay: **"$299B · 14% · 82% · 5%"** | "Last year, slow payments cost US construction 299 billion dollars. A 14-percent hidden tax on every project. 82 percent of contractors wait over 30 days past due. Only 5 percent of subcontractors get paid on time." | Overlay stays up through the whole stat. |
+| 3 | 0:15–0:35 | Title card overlay: **"30-90d · KES · 40% · 24/7"** | "In Nairobi construction, contractors can wait 30 to 90 days after approval. Contracts are local, materials are dollar-linked, and finance is still a major constraint for firms across Sub-Saharan Africa." | Overlay stays up through the whole stat. |
 | 4 | 0:35–0:55 | Back to founder. | "This isn't a banking problem. It's a workflow problem. When a sub finishes work, the money doesn't move because the approval doesn't move. Drawings sit in email. Revisions sit in WhatsApp. The certifier has no queue. The payment waits on paperwork that never lands." | Hit "approval" hard. |
 | 5 | 0:55–1:10 | Founder. | "WEZA Build is an approval-to-payout platform for construction teams. Contractors submit. Certifiers review and approve. Owners click once, and the payment moves on Solana — permanent, auditable, tied to that specific milestone." | One sentence product definition. |
 | 6 | 1:10–1:40 | Cut to **screen recording of the full loop at 1.5x speed**, captioned. | Voice-over: "This is the entire loop. Submit. Review. Approve. Trigger payout. The audit trail updates live across every role." | Cue this recording up before you start. It's pre-rendered. |
 | 7 | 1:40–2:00 | Founder. | "Why Solana. Drawings stay off chain. But every payout is one USDC transfer with a memo tag — project, milestone, submission, approver. Sub-cent cost. Real-time confirmation. Anyone can verify which real-world approval caused this transfer on Explorer." | "Memo tag" is the phrase that signals you know what you're doing. |
-| 8 | 2:00–2:25 | Founder. | "I've shown the prototype to [N] contractor offices. [Specific quote from one]. That's why we're here. Construction is the biggest industry still running approvals on email. That's what we're replacing." | REPLACE the placeholder with a real partner quote from `docs/TRACTION.md` before recording. |
-| 9 | 2:25–2:40 | Founder. | "Today: deployed, end-to-end loop, real devnet USDC moving with tagged signatures on every payout. Next 90 days: two live pilots, Nairobi and Accra. We're applying for the Colosseum accelerator to run those pilots." | If you don't have pilots yet, say "the first two pilots." Don't overclaim. |
+| 8 | 2:00–2:25 | Founder. | "Kenya's public pending bills include over KSh 240 billion owed to development-project contractors. Contractors do not just need faster payment; they need proof a certifier and owner cannot quietly rewrite." | Cite the pending-bills source in your deck notes. |
+| 9 | 2:25–2:40 | Founder. | "Today: deployed, end-to-end loop, real devnet approval and payout signatures. Next 90 days: recruit two Nairobi/Accra design partners and run the first live milestone." | If pilots are not committed, say "recruit." Don't overclaim. |
 | 10 | 2:40–2:50 | Founder, slight pause. | "WEZA Build. Approval-to-payout for construction. Link in the description." | End on the URL. |
 
 **Common mistakes to avoid**
@@ -50,7 +50,7 @@ Before recording: run `npm run seed` against the live Supabase project, log into
 | 4 | 0:40–0:55 | Pan to certifier window — **do not refresh**. | "No refresh. Certifier's view updates live. The audit rail flashes green. That's the audit endpoint polling since-last-event." | Wait ~3 seconds for the poll to fire. |
 | 5 | 0:55–1:15 | Certifier: click Request revision with a note. | "Certifier requests a revision. Ball flips to contractor." | Note: "tighten rebar spec." Click Request revision. |
 | 6 | 1:15–1:30 | Contractor window. | "Contractor resubmits v2." | Drop another file, click Resubmit. |
-| 7 | 1:30–1:50 | Certifier window. Click Approve. | "Certifier approves. One transaction: submission approved, milestone approved, payout ready, three audit rows." | Click Approve milestone. |
+| 7 | 1:30–1:50 | Certifier window. Click Approve. | "Certifier approves. First, WEZA records a Solana Memo approval proof. Only then does the database mark payout ready." | Click Approve milestone. |
 | 8 | 1:50–2:10 | Owner window, payout panel. | "Owner's turn. One click." | Click **Trigger payout · 120,000 USDC**. |
 | 9 | 2:10–2:25 | Zoom on the Settled banner, then click **View on Explorer**. | "Devnet tx. Two instructions. Memo program carrying the milestone context. SPL TransferChecked of 120,000 USDC. Anyone can verify which approval caused this transfer." | Click Explorer link. Expand Memo + Token Balances. Let it breathe for 5 seconds. |
 | 10 | 2:25–2:30 | Back to milestone page. | "Approval-to-payout. Off-chain workflow, on-chain proof. That's it." | End. |
@@ -65,7 +65,7 @@ Before recording: run `npm run seed` against the live Supabase project, log into
 
 ## Thumbnail
 
-Static frame, dark background, four numbers white: **$299B · 14% · 82% · 5%**. Caption: "Approval-to-payout for construction. Solana." This works as the YouTube/Vimeo/Devpost thumbnail and as slide 1 of the deck.
+Static frame, dark background, four numbers white: **30-90d · KES · 40% · 24/7**. Caption: "On-chain approval-to-payout for African construction." This works as the YouTube/Vimeo/Devpost thumbnail and as slide 1 of the deck.
 
 ## Where to host
 

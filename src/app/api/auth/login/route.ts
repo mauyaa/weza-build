@@ -26,21 +26,28 @@ export async function POST(req: NextRequest) {
       return fail("Invalid email or password", "invalid_credentials", 401);
     }
     data = result.data;
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return fail(`Login service unavailable: ${message}`, "auth_unavailable", 503);
+  } catch {
+    return fail(
+      "Login is temporarily unavailable. Please ask the demo operator to verify Supabase configuration.",
+      "auth_unavailable",
+      503
+    );
   }
 
   const profile = await getProfile(data.user.id).catch((err) => {
-    throw new DomainError(
-      "profile_lookup_failed",
-      err instanceof Error ? err.message : String(err),
-      503
-    );
+    const message = err instanceof Error ? err.message : String(err);
+    return new DomainError("profile_lookup_failed", message, 503);
   });
+  if (profile instanceof DomainError) {
+    return fail(
+      "Login profile lookup is temporarily unavailable. Please try again in a moment.",
+      profile.code,
+      profile.status
+    );
+  }
   if (!profile) {
     return fail(
-      "Signed in, but no WEZA profile exists. Re-run the seed script or create the profile trigger in Supabase.",
+      "This account is signed in but is not attached to a WEZA workspace. Ask the demo operator to reseed the demo accounts.",
       "profile_missing",
       409
     );

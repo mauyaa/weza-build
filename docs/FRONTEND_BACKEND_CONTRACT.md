@@ -79,7 +79,7 @@ Returns `{ decision, submission, milestone, payout, audit }`. Idempotent on repe
 ### `POST /api/milestones/:id/payout` (owner)
 
 1. Locks payout to `triggered`; writes `payout.triggered` audit row.
-2. Refuses to run unless the milestone has an approval transaction/PDA, then calls `performDevnetPayoutProof` → USDC `TransferChecked` + Memo on Solana devnet via `SOLANA_RPC_URL` using `SOLANA_TREASURY_KEYPAIR`.
+2. Refuses to run unless the milestone has a stored approval transaction signature and correlation address, then calls `performDevnetPayoutProof` → USDC `TransferChecked` + Memo on Solana devnet via `SOLANA_RPC_URL` using `SOLANA_TREASURY_KEYPAIR`.
 3. On success: payout `confirmed`, milestone `settled`, `payout.confirmed` audit row with signature.
 4. On failure: payout `failed`, milestone reverts to `approved`, retryable.
 

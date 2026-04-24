@@ -73,7 +73,7 @@ export function PayoutPanel({
           }
         />
         {milestone.approval_pda && (
-          <Row label="Approval PDA" value={<span className="mono">{shortWallet(milestone.approval_pda)}</span>} />
+          <Row label="Approval address" value={<span className="mono">{shortWallet(milestone.approval_pda)}</span>} />
         )}
         {payout?.triggered_at && (
           <Row label="Triggered" value={<span>{formatDateTime(payout.triggered_at)}</span>} />

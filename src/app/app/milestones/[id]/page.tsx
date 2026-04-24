@@ -226,7 +226,7 @@ function OnChainApprovalBanner({
           Certifier approval recorded on {network ?? "solana-devnet"}
         </div>
         <div className="text-xs text-violet-900/75 mt-1">
-          Approval PDA <span className="mono">{shortSig(pda ?? undefined, 8)}</span> unlocks the payout queue.
+          Approval proof <span className="mono">{shortSig(pda ?? undefined, 8)}</span> unlocks the payout queue.
         </div>
       </div>
       <a

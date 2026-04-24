@@ -28,7 +28,7 @@ Before going on camera, hit `/api/health/solana` — confirm `mode: "live"`, `la
 | 0:35 | Certifier | Switch window — milestone is **already updated live** (no refresh) | `Review desk` dashboard counts have moved. Handoff on the milestone is now **Ball is with · Zanele Mbeki · review submission**. |
 | 0:45 | Certifier | **Request revision** with a note | Submission chip → *Revision requested*. Handoff → **Ball is with · Kofi · resubmit**. Contractor's audit rail flashes green in real time. |
 | 1:00 | Contractor | Resubmit v2 | v1 shows the revision decision attached; v2 goes under review. |
-| 1:15 | Certifier | **Record approval on Solana** | Approval transaction lands first; milestone becomes *Approved*, payout becomes *Ready*, and the approval PDA appears on the page. |
+| 1:15 | Certifier | **Record approval on Solana** | Approval Memo transaction lands first; milestone becomes *Approved*, payout becomes *Ready*, and the approval proof appears on the page. |
 | 1:30 | Owner | Open the milestone from *Pay out* action card | Payout panel shows **Trigger payout · 120,000 USDC**. |
 | 1:40 | Owner | Click it | Payout flips *Triggered → Confirmed*. Large green banner lands at the top of the page: **Settled on Solana devnet · 120,000 USDC** with **View on Explorer**. |
 | 1:55 | Owner | Click **View on Explorer** | Solana Explorer devnet opens with the real transaction signature. |

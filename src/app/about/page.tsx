@@ -66,7 +66,7 @@ export default function AboutPage() {
           <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">The loop</h2>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <LoopCard title="Contractor submits" body="Drawing or evidence package lands with version, file hash, and private storage pointer." tone="blue" />
-            <LoopCard title="Certifier signs on-chain" body="Approval records a milestone PDA; payout cannot become ready without that Solana proof." tone="violet" />
+            <LoopCard title="Certifier signs on-chain" body="Approval sends a structured Solana Memo transaction; payout cannot become ready without that signature." tone="violet" />
             <LoopCard title="Owner pays out" body="One click moves devnet USDC and links the transfer to the approval record." tone="green" />
           </div>
         </div>
@@ -77,10 +77,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">Open the chain</h2>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              This deploy makes Solana load-bearing: certifier approval is recorded first, then payout unlocks. The treasury balance and address below are pulled live from RPC — click through to Solana Explorer and verify the mint, ATA, approval, and payout signatures.
+              This deploy makes Solana load-bearing: certifier approval is recorded first as a signed Memo transaction, then payout unlocks. The treasury balance and address below are pulled live from RPC — click through to Solana Explorer and verify the mint, ATA, approval, and payout signatures.
             </p>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              The hackathon build ships a minimal Anchor milestone-approval program design and a devnet proof path. Payout remains a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with structured memo context, so any auditor can reconstruct which real-world approval caused the transfer.
+              The hackathon build ships a devnet approval proof path now and a minimal Anchor milestone-approval program source for the next on-chain-state upgrade. Payout remains a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with structured memo context, so any auditor can reconstruct which real-world approval caused the transfer.
             </p>
           </div>
           <TreasuryStatus />

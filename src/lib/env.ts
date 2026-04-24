@@ -45,5 +45,6 @@ export const env = {
   isProduction: () => process.env.NODE_ENV === "production",
   allowMockSolana: () =>
     process.env.NODE_ENV !== "production" && process.env.WEZA_MOCK_SOLANA === "1",
+  allowPublicSignup: () => process.env.WEZA_PUBLIC_SIGNUP === "1",
   storageBucket: () => process.env.WEZA_STORAGE_BUCKET || "submissions",
 };
