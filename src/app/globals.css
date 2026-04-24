@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    height: 100%;
+  }
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased font-sans;
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-ink-200 rounded-xl shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition
+           focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800 shadow-card;
+  }
+  .btn-brand {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 shadow-card;
+  }
+  .btn-amber {
+    @apply btn bg-amber-500 text-white hover:bg-amber-600 shadow-card;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 shadow-card;
+  }
+  .btn-ghost {
+    @apply btn bg-white text-ink-700 border border-ink-200 hover:bg-ink-50;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border;
+  }
+  .kpi {
+    @apply card p-4 flex flex-col gap-1;
+  }
+  .label {
+    @apply block text-xs font-medium text-ink-500 mb-1;
+  }
+  .input, .textarea {
+    @apply w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
+  }
+  .textarea { @apply min-h-[88px]; }
+  .divider { @apply h-px bg-ink-200; }
+  .mono { font-variant-numeric: tabular-nums; @apply font-mono; }
+}

@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+dist/
+*.log
+.DS_Store
+.env
+.env.local
+.weza-treasury.json
+data/*.db
+data/*.db-*
+coverage/
+.vercel
+tsconfig.tsbuildinfo
