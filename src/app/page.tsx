@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { DeployConfigBanner } from "@/components/deploy-config-banner";
 import { getCurrentProfile } from "@/lib/session";
 import { LoginForm } from "./login-form";
 
@@ -30,7 +31,10 @@ export default async function LoginPage() {
         </div>
       </div>
       <div className="flex-1 flex items-center justify-center p-8">
-        <LoginForm />
+        <div className="w-full max-w-md">
+          <DeployConfigBanner />
+          <LoginForm />
+        </div>
       </div>
     </div>
   );

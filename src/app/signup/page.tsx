@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { DeployConfigBanner } from "@/components/deploy-config-banner";
 import { getCurrentProfile } from "@/lib/session";
 import { SignupForm } from "./signup-form";
 
@@ -22,7 +23,10 @@ export default async function SignupPage() {
         </div>
       </div>
       <div className="flex-1 flex items-center justify-center p-8">
-        <SignupForm />
+        <div className="w-full max-w-md">
+          <DeployConfigBanner />
+          <SignupForm />
+        </div>
       </div>
     </div>
   );
