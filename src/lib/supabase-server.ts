@@ -4,7 +4,7 @@ import { env } from "./env";
 
 export function supabaseServer() {
   const store = cookies();
-  return createServerClient(env.supabaseUrl(), env.supabaseAnonKey(), {
+  return createServerClient(env.supabaseUrlForServer(), env.supabaseAnonKeyForServer(), {
     cookies: {
       get: (name: string) => store.get(name)?.value,
       set: (name: string, value: string, options: CookieOptions) => {

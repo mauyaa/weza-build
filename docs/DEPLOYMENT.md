@@ -104,6 +104,8 @@ The seed script:
    |---|---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | Production, Preview | from step 1 |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Production, Preview | from step 1 |
+   | `SUPABASE_URL` | Production, Preview | **same as** `NEXT_PUBLIC_SUPABASE_URL` (server runtime; fixes `/` 500 if public vars were missing at first build) |
+   | `SUPABASE_ANON_KEY` | Production, Preview | **same as** `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
    | `SUPABASE_SERVICE_ROLE_KEY` | Production, Preview | from step 1 (encrypted) |
    | `DATABASE_URL` | Production, Preview | from step 1 (encrypted) |
    | `SOLANA_RPC_URL` | Production, Preview | from step 4 |

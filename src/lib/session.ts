@@ -9,8 +9,8 @@ import type { Profile } from "./types";
  */
 export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   const supabase = supabaseServer();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) return null;
   return getProfile(data.user.id);
 });
 
