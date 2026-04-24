@@ -15,14 +15,29 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return fail("Email and password required", "validation", 400);
 
-  const supabase = supabaseServer();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
-    password: parsed.data.password,
-  });
-  if (error || !data.user) return fail("Invalid email or password", "invalid_credentials", 401);
+  let data;
+  try {
+    const supabase = supabaseServer();
+    const result = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+    if (result.error || !result.data.user) {
+      return fail("Invalid email or password", "invalid_credentials", 401);
+    }
+    data = result.data;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return fail(`Login service unavailable: ${message}`, "auth_unavailable", 503);
+  }
 
-  const profile = await getProfile(data.user.id);
+  const profile = await getProfile(data.user.id).catch((err) => {
+    throw new DomainError(
+      "profile_lookup_failed",
+      err instanceof Error ? err.message : String(err),
+      503
+    );
+  });
   if (!profile) {
     return fail(
       "Signed in, but no WEZA profile exists. Re-run the seed script or create the profile trigger in Supabase.",
