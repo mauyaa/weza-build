@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { listProjectsForUser } from "@/lib/repo";
 import { actionQueue, dashboardKpis, recentAudit } from "@/lib/views";
@@ -7,7 +8,8 @@ import { AuditRow } from "@/components/audit-row";
 import { ActionCard } from "@/components/action-card";
 
 export default async function Dashboard() {
-  const profile = (await getCurrentProfile())!;
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/");
   const [kpis, queue, audit, projects] = await Promise.all([
     dashboardKpis(profile),
     actionQueue(profile),

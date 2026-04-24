@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import {
   getLatestPayout,
@@ -23,7 +23,8 @@ import { LiveMilestoneAudit } from "@/components/live-audit";
 import { HandoffPill } from "@/components/handoff-pill";
 
 export default async function MilestonePage({ params }: { params: { id: string } }) {
-  const profile = (await getCurrentProfile())!;
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/");
   const milestone = await getMilestone(params.id);
   if (!milestone) notFound();
   const project = (await getProject(milestone.project_id))!;

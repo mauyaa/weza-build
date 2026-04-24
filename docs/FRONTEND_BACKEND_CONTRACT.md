@@ -93,6 +93,10 @@ Powers the live cross-role audit rail. Returns `{ events, milestone: { status, p
 
 Returns `{ mode, publicKey, lamports, rpcUrl, cluster, explorer }` or `mode: "mock"` in non-production dev. Fails with `treasury_unavailable` if the treasury env is missing or the RPC is unreachable.
 
+### `GET /api/health/config`
+
+Returns redacted runtime readiness checks for required environment variables, Supabase server aliases, Solana settings, and the expected Postgres tables. It never returns secret values. Fails with `config_unavailable` if required env is missing, the database is unreachable, or migrations have not created the expected schema.
+
 ## Why the envelope is shaped this way
 
 The frontend updates the milestone page in one round-trip after any action. Every write endpoint returns the full set of entities the page renders, so the React layer needs at most a single `router.refresh()` — never a cascade of follow-up reads.

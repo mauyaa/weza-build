@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { getProfile, getProject, listAudit } from "@/lib/repo";
 import { milestonesForProject } from "@/lib/views";
@@ -8,7 +8,8 @@ import { MilestoneChip, PayoutChip, SubmissionChip } from "@/components/status-c
 import { AuditRow } from "@/components/audit-row";
 
 export default async function ProjectDetail({ params }: { params: { id: string } }) {
-  const profile = (await getCurrentProfile())!;
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/");
   const project = await getProject(params.id);
   if (!project) notFound();
   if (
