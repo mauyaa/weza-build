@@ -13,6 +13,14 @@ Throughout this script, `BASE` is that URL.
 ## 1. Health check — Solana treasury
 
 ```bash
+curl -s "$BASE/api/health/config" | jq
+```
+
+**Pass:** `success: true`, `data.supabase.ready == true`, `data.database_url == true`, and `data.service_role == true`.
+
+**Fail:** any missing field means login/seed/server writes can fail even if `/about` renders.
+
+```bash
 curl -s "$BASE/api/health/solana" | jq
 ```
 

@@ -118,7 +118,9 @@ The seed script:
 
 ## 7. Post-deploy verification
 
-Open `https://YOUR-DEPLOY.vercel.app/api/health/solana`. You should see:
+Open `https://YOUR-DEPLOY.vercel.app/api/health/config` first. It should return `success: true` with every required env check set to `true`. If it returns `config_unavailable`, fix Vercel env vars before testing login.
+
+Then open `https://YOUR-DEPLOY.vercel.app/api/health/solana`. You should see:
 
 ```json
 {

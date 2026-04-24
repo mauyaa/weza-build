@@ -72,7 +72,7 @@ From your laptop, with the live envs loaded:
 
 Walk through `docs/SMOKE_TEST.md` end to end.
 
-- [ ] §1 `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
+- [ ] §1 `/api/health/config` returns `success: true`; `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
 - [ ] §2 signup creates auth user + profile.
 - [ ] §3 login succeeds, wrong password is rejected.
 - [ ] §4 full loop runs, produces a real 88-char base58 signature.
