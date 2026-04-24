@@ -10,7 +10,17 @@ Run this against a fresh deploy (or locally with the full env set) after every n
 
 Throughout this script, `BASE` is that URL.
 
-## 1. Health check — Solana treasury
+## 1. Health check — runtime config + database
+
+```bash
+curl -s "$BASE/api/health/config" | jq
+```
+
+**Pass:** `success == true`, every `data.env.*` value is `true`, `data.supabaseServerReady == true`, `data.database.connected == true`, and `data.database.missingTables == []`.
+
+**Fail:** `config_unavailable` means one or more runtime secrets are absent, the server Supabase aliases are missing, or `DATABASE_URL` cannot reach the migrated schema.
+
+## 2. Health check — Solana treasury
 
 ```bash
 curl -s "$BASE/api/health/solana" | jq
@@ -20,7 +30,7 @@ curl -s "$BASE/api/health/solana" | jq
 
 **Fail:** `mode: mock` (production env mis-set), `treasury_unavailable` (RPC or treasury not configured), `lamports` low (SOL airdrop), or `usdcUi` low (top up from <https://faucet.circle.com>).
 
-## 2. Signup + Supabase Auth + profile trigger
+## 3. Signup + Supabase Auth + profile trigger
 
 ```bash
 curl -s -c /tmp/c -X POST "$BASE/api/auth/signup" \
@@ -38,7 +48,7 @@ Log out:
 curl -s -b /tmp/c -X POST "$BASE/api/auth/logout" -i | head -1
 ```
 
-## 3. Login with a demo account
+## 4. Login with a demo account
 
 ```bash
 curl -s -c /tmp/c -X POST "$BASE/api/auth/login" \
@@ -48,7 +58,7 @@ curl -s -c /tmp/c -X POST "$BASE/api/auth/login" \
 
 **Pass:** `true`. Wrong password returns `success:false`, `code: invalid_credentials`.
 
-## 4. Full workflow loop
+## 5. Full workflow loop
 
 The steps below match `docs/DEMO_WALKTHROUGH.md` with API calls instead of UI clicks. All calls assume you've logged in with the matching role.
 
@@ -93,7 +103,7 @@ curl -s -b /tmp/c -X POST "$BASE/api/milestones/$MID/payout" | jq .data.payout.t
 
 **Pass:** same signature returned, no second on-chain transaction (check `/api/health/solana` — treasury lamports only decreased by 5000 for the whole loop).
 
-## 5. RLS sanity
+## 6. RLS sanity
 
 From the Supabase dashboard SQL editor, run as the `authenticated` role:
 
@@ -106,7 +116,7 @@ RESET ROLE;
 
 **Pass:** rows returned match the user's project membership, no cross-org leakage.
 
-## 6. File download authorization
+## 7. File download authorization
 
 **As contractor**, request a signed URL for your own version:
 
@@ -124,7 +134,7 @@ curl -s -b /tmp/c -i "$BASE/api/versions/$SVID/file" | head -3
 
 **Pass:** `HTTP/1.1 403` with code `forbidden`.
 
-## 7. Production-only guardrails
+## 8. Production-only guardrails
 
 In your Vercel deployment **Settings → Environment Variables**, set `WEZA_MOCK_SOLANA=1`, redeploy, and hit `/api/health/solana`.
 

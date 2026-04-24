@@ -1,9 +1,11 @@
+import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { recentAudit } from "@/lib/views";
 import { AuditRow } from "@/components/audit-row";
 
 export default async function AuditPage() {
-  const profile = (await getCurrentProfile())!;
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/");
   const events = await recentAudit(profile, 200);
   return (
     <div className="mx-auto max-w-5xl px-6 py-8 space-y-4">
