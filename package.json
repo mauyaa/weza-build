@@ -1,0 +1,43 @@
+{
+  "name": "weza-build",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WEZA Build — approval-to-payout platform for construction teams. Solana devnet payout proof.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "seed": "tsx scripts/seed.ts",
+    "test": "vitest run",
+    "db:migrate": "tsx scripts/migrate.ts"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "1.95.3",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.104.1",
+    "clsx": "2.1.1",
+    "next": "14.2.15",
+    "pg": "^8.20.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwind-merge": "2.5.2",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.4.4",
+    "@types/node": "20.14.10",
+    "@types/pg": "^8.20.0",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.15",
+    "postcss": "8.4.47",
+    "tailwindcss": "3.4.13",
+    "tsx": "4.19.1",
+    "typescript": "5.5.4",
+    "vitest": "2.1.1"
+  }
+}
