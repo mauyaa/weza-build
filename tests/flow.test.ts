@@ -61,7 +61,11 @@ describe("approval-to-payout flow", () => {
     const result = await triggerPayout({
       milestoneId: fx.milestone.id,
       actor: fx.owner,
-      runOnChain: async (_args) => ({ txSignature: mockSig, network: "solana-devnet", confirmed: true }),
+      runOnChain: async (args) => {
+        expect(args.approvalPda).toBe(d2.milestone.approval_pda);
+        expect(args.memo.approvalPda).toBe(d2.milestone.approval_pda);
+        return { txSignature: mockSig, network: "solana-devnet", confirmed: true };
+      },
     });
     expect(result.milestone.status).toBe("settled");
     expect(result.milestone.payout_status).toBe("confirmed");

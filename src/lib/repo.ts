@@ -733,12 +733,14 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
 export interface OnChainRunArgs {
   amountUsdc: number;
   recipient: string;
+  approvalPda: string;
   memo: {
     projectCode: string;
     milestoneSequence: number;
     milestoneId: string;
     submissionId?: string | null;
     approvedBy: string;
+    approvalPda?: string | null;
   };
 }
 
@@ -749,6 +751,13 @@ export interface TriggerPayoutInput {
     txSignature: string;
     network: string;
     confirmed: boolean;
+    approvalTxSignature?: string | null;
+    squads?: {
+      multisigPda: string;
+      vaultPda: string;
+      transactionIndex: bigint;
+      certifierApprovalSignature: string | null;
+    } | null;
   }>;
 }
 
@@ -826,21 +835,36 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
     const result = await input.runOnChain({
       amountUsdc: Number(payout.amount_usdc),
       recipient: payout.recipient_wallet,
+      approvalPda: milestone.approval_pda,
       memo: {
         projectCode: project.code,
         milestoneSequence: milestone.sequence,
         milestoneId: milestone.id,
         submissionId: approvedSubmission?.id ?? null,
         approvedBy: project.certifier_id,
+        approvalPda: milestone.approval_pda,
       },
     });
     await withTx(async (client) => {
       if (result.confirmed) {
         await client.query(
           `UPDATE payout_instructions
-             SET tx_signature = $2, status = 'confirmed', confirmed_at = now()
+             SET tx_signature = $2,
+                 status = 'confirmed',
+                 confirmed_at = now(),
+                 squads_multisig_pda = $3,
+                 squads_vault_pda = $4,
+                 squads_transaction_index = $5,
+                 squads_approval_tx_signature = $6
            WHERE id = $1`,
-          [payout.id, result.txSignature]
+          [
+            payout.id,
+            result.txSignature,
+            result.squads?.multisigPda ?? null,
+            result.squads?.vaultPda ?? null,
+            result.squads?.transactionIndex?.toString() ?? null,
+            result.squads?.certifierApprovalSignature ?? result.approvalTxSignature ?? null,
+          ]
         );
         await client.query(
           `UPDATE milestones
@@ -862,10 +886,36 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
             txSignature: result.txSignature,
           })
         );
+        if (result.approvalTxSignature) {
+          audits.push(
+            await writeAuditTx(client, {
+              orgId: project.org_id,
+              projectId: project.id,
+              milestoneId: milestone.id,
+              actor: input.actor,
+              action: "payout.confirmed",
+              message: `Squads 2-of-2 approval confirmed before payout execution`,
+              txSignature: result.approvalTxSignature,
+            })
+          );
+        }
       } else {
         await client.query(
-          "UPDATE payout_instructions SET tx_signature = $2 WHERE id = $1",
-          [payout.id, result.txSignature]
+          `UPDATE payout_instructions
+             SET tx_signature = $2,
+                 squads_multisig_pda = $3,
+                 squads_vault_pda = $4,
+                 squads_transaction_index = $5,
+                 squads_approval_tx_signature = $6
+           WHERE id = $1`,
+          [
+            payout.id,
+            result.txSignature,
+            result.squads?.multisigPda ?? null,
+            result.squads?.vaultPda ?? null,
+            result.squads?.transactionIndex?.toString() ?? null,
+            result.squads?.certifierApprovalSignature ?? result.approvalTxSignature ?? null,
+          ]
         );
       }
     });

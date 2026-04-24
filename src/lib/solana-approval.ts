@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 import { env } from "./env";
 import {
   getMilestone,
@@ -7,11 +7,11 @@ import {
   listVersions,
   type OnChainApprovalProof,
 } from "./repo";
-import { buildMemoInstruction, explorerUrl, sendTreasuryTransaction } from "./solana";
+import { buildMemoInstruction, explorerUrl, getSolanaConnection, loadSolanaTreasury, sendTreasuryTransaction } from "./solana";
 import type { Profile } from "./types";
 
 export const WEZA_APPROVAL_PROGRAM_ID = new PublicKey(
-  "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+  env.wezaApprovalProgramId()
 );
 
 export interface OnChainApprovalArgs {
@@ -48,9 +48,42 @@ export function approvalProgramStatus() {
   return {
     programId: WEZA_APPROVAL_PROGRAM_ID.toBase58(),
     network: `solana-${env.solanaCluster()}`,
-    mode: env.allowMockSolana() ? "mock" : "memo-proof",
-    note: "Approval is a real Solana transaction today; Anchor PDA source is included for the deployed program path.",
+    mode: env.allowMockSolana() ? "mock" : "anchor-pda",
+    note: "Approval is recorded by the WEZA Anchor program; payout checks the PDA account before USDC can move.",
   };
+}
+
+function encodeAnchorString(value: string): Buffer {
+  const raw = Buffer.from(value, "utf8");
+  const len = Buffer.alloc(4);
+  len.writeUInt32LE(raw.length, 0);
+  return Buffer.concat([len, raw]);
+}
+
+function approveMilestoneDiscriminator(): Buffer {
+  // sha256("global:approve_milestone").slice(0, 8)
+  return Buffer.from([37, 11, 194, 224, 62, 255, 234, 245]);
+}
+
+function buildApproveMilestoneInstruction(args: {
+  projectId: string;
+  milestoneId: string;
+  approvalPda: PublicKey;
+  certifier: PublicKey;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: WEZA_APPROVAL_PROGRAM_ID,
+    keys: [
+      { pubkey: args.approvalPda, isSigner: false, isWritable: true },
+      { pubkey: args.certifier, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.concat([
+      approveMilestoneDiscriminator(),
+      encodeAnchorString(args.projectId),
+      encodeAnchorString(args.milestoneId),
+    ]),
+  });
 }
 
 export async function recordMilestoneApproval(args: OnChainApprovalArgs): Promise<OnChainApprovalResult> {
@@ -85,7 +118,21 @@ export async function recordMilestoneApproval(args: OnChainApprovalArgs): Promis
     };
   }
 
-  const signature = await sendTreasuryTransaction(buildMemoInstruction(memo).ix);
+  const approvalPk = new PublicKey(pda);
+  const certifier = loadSolanaTreasury().publicKey;
+  const signature = await sendTreasuryTransaction(
+    buildApproveMilestoneInstruction({
+      projectId: args.projectId,
+      milestoneId: args.milestoneId,
+      approvalPda: approvalPk,
+      certifier,
+    }),
+    buildMemoInstruction(memo).ix
+  );
+  const account = await getSolanaConnection().getAccountInfo(approvalPk, "confirmed");
+  if (!account) {
+    throw new Error(`WEZA approval PDA ${pda} was not created by the Anchor program`);
+  }
   return {
     txSignature: signature,
     network: `solana-${env.solanaCluster()}`,

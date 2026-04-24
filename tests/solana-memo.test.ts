@@ -40,5 +40,7 @@ describe("on-chain payout envelope", () => {
     expect(captured!.memo.projectCode).toBe(fx.project.code);
     expect(captured!.memo.approvedBy).toBe(fx.certifier.id);
     expect(captured!.memo.submissionId).toBe(s1.submission.id);
+    expect(captured!.approvalPda).toBe(approvalProof(fx.milestone.id).approvalPda);
+    expect(captured!.memo.approvalPda).toBe(captured!.approvalPda);
   });
 });

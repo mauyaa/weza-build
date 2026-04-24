@@ -36,7 +36,7 @@ export default function AboutPage() {
               On-chain milestone approval<br />for African construction.
             </h1>
             <p className="mt-6 text-lg text-ink-600 leading-relaxed">
-              Nairobi contractors often wait 30–90 days after work is certified, while paper approvals vanish into email, WhatsApp, and bank queues. WEZA Build turns each certified construction milestone into a public Solana approval record before payout can unlock.
+              Kenya&rsquo;s construction sector is a $15B+ market where contractors wait 60–90 days for payment because there is no trusted record of certified completion. WEZA anchors every approval to an immutable Solana transaction — any party can verify it forever without trusting the platform.
             </p>
             <div className="mt-10 flex gap-3">
               <Link href="/signup" className="btn-primary">Create an account</Link>
@@ -48,15 +48,15 @@ export default function AboutPage() {
 
       <section className="border-b border-ink-200 bg-ink-50">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">East African payment trust gap</h2>
+          <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">Kenya payment trust gap</h2>
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Stat big="30–90d" small="common contractor payment delay after approval" />
-            <Stat big="40%" small="of Sub-Saharan African firms identify finance as a major constraint (World Bank)" />
-            <Stat big="KES" small="local contracts, dollar-linked materials, thin cash buffers" />
-            <Stat big="24/7" small="public audit evidence outside any one operator" />
+            <Stat big="$15B+" small="Kenya construction market scale" />
+            <Stat big="60–90d" small="common contractor payment delay after certification" />
+            <Stat big="3 roles" small="Owner, Certifier, Contractor in one loop" />
+            <Stat big="Forever" small="approval evidence on public Solana rails" />
           </div>
           <p className="mt-8 text-ink-600 max-w-2xl leading-relaxed">
-            The problem is counterparty trust before it is payment rails. WEZA gives owners, certifiers, contractors, lenders, donors, and arbitrators a shared record: the exact package submitted, the certifier&rsquo;s approval transaction, and the USDC payout proof.
+            The problem is counterparty trust before it is payment rails. WEZA gives the Owner, Certifier, and Contractor a shared record: the exact package submitted, the certifier&rsquo;s Anchor approval, and the Squads-approved payout proof.
           </p>
         </div>
       </section>
@@ -65,9 +65,9 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">The loop</h2>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <LoopCard title="Contractor submits" body="Drawing or evidence package lands with version, file hash, and private storage pointer." tone="blue" />
-            <LoopCard title="Certifier signs on-chain" body="Approval sends a structured Solana Memo transaction; payout cannot be readied without that signature." tone="violet" />
-            <LoopCard title="Owner pays out" body="One click moves devnet USDC and links the transfer to the approval record." tone="green" />
+            <LoopCard title="Contractor submits" body="Evidence lands with version, file hash, milestone scope, and private storage pointer." tone="blue" />
+            <LoopCard title="Certifier anchors approval" body="A custom Anchor program creates the milestone approval PDA. Without it, payout fails." tone="violet" />
+            <LoopCard title="Owner + certifier pay out" body="Squads multisig coordinates the 2-of-2 payout before devnet USDC moves." tone="green" />
           </div>
         </div>
       </section>
@@ -77,10 +77,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-sm uppercase tracking-wider text-ink-500 font-semibold">Open the chain</h2>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              This deploy makes Solana load-bearing: certifier approval is recorded first as a signed Memo transaction, then payout unlocks. The treasury balance and address below are pulled live from RPC — click through to Solana Explorer and verify the mint, ATA, approval, and payout signatures.
+              This deploy makes Solana load-bearing: certifier approval creates an Anchor PDA first, then payout must include that PDA as a required account. The treasury balance and address below are pulled live from RPC — click through to Solana Explorer and verify the mint, ATA, approval, and payout signatures.
             </p>
             <p className="mt-4 text-ink-700 leading-relaxed">
-              The hackathon build ships a devnet approval proof path now and a minimal Anchor milestone-approval program source for the next on-chain-state upgrade. Payout remains a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with structured memo context, so any auditor can reconstruct which real-world approval caused the transfer.
+              Powered by Squads multisig and a custom Anchor program. Payout remains a <code className="mono text-xs bg-ink-100 px-1 py-0.5 rounded">TransferChecked</code> with structured memo context, so any auditor can reconstruct which real-world approval caused the transfer.
             </p>
           </div>
           <TreasuryStatus />
@@ -112,7 +112,7 @@ export default function AboutPage() {
 
       <footer className="mx-auto max-w-6xl px-6 py-10 text-sm text-ink-500 flex items-center justify-between">
         <span>WEZA Build · Solana devnet · Colosseum submission</span>
-        <Link href="/signup" className="text-brand-700 hover:underline font-medium">Get started →</Link>
+            <Link href="/demo" className="text-brand-700 hover:underline font-medium">Launch judge demo →</Link>
       </footer>
     </div>
   );

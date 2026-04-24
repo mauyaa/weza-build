@@ -128,7 +128,12 @@ export interface PayoutInstruction {
   recipient_wallet: string;
   status: PayoutStatus;
   tx_signature: string | null;
+  approval_tx_signature: string | null;
   network: string;
+  squads_multisig_pda: string | null;
+  squads_vault_pda: string | null;
+  squads_transaction_index: string | null;
+  squads_approval_tx_signature: string | null;
   triggered_by: string | null;
   triggered_at: string | null;
   confirmed_at: string | null;

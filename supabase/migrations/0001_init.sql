@@ -136,6 +136,11 @@ create table if not exists payout_instructions (
   status text not null default 'ready'
     check (status in ('not_ready','ready','triggered','confirmed','failed','held')),
   tx_signature text,
+  approval_tx_signature text,
+  squads_multisig_pda text,
+  squads_vault_pda text,
+  squads_transaction_index text,
+  squads_approval_tx_signature text,
   network text not null default 'solana-devnet',
   triggered_by uuid references profiles(id),
   triggered_at timestamptz,

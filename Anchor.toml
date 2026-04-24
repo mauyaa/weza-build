@@ -1,0 +1,13 @@
+[features]
+seeds = false
+skip-lint = false
+
+[programs.devnet]
+weza_approval = "ABaXxAFwdeKc82mocL2nKzd1JsVdXDKtesxArpEyqNxH"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "npm test"
