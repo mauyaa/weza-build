@@ -6,6 +6,12 @@ WEZA Build turns construction milestone approval into a tracked workflow that mo
 
 **Live deployment:** [https://weza-build.vercel.app](https://weza-build.vercel.app)
 
+## Ownership and license
+
+WEZA Build is a solo-founder project designed, built, and shipped by **Bevan Mauya Bosire** for the Solana Frontier Hackathon.
+
+Copyright (c) 2026 Bevan Mauya Bosire. All rights reserved. This repository is proprietary and shared for hackathon judging and accelerator review. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+
 ## What it does
 
 One loop, end to end:

@@ -1,0 +1,18 @@
+WEZA Build Ownership Notice
+
+Project: WEZA Build
+Owner: Bevan Mauya Bosire
+Copyright: Copyright (c) 2026 Bevan Mauya Bosire. All rights reserved.
+
+WEZA Build was designed, built, and shipped as a solo-founder project by Bevan
+Mauya Bosire for the Solana Frontier Hackathon.
+
+The original work in this repository includes the product concept, user
+workflows, interface implementation, backend route handlers, database schema and
+migrations, Supabase integration, Solana devnet payout proof implementation,
+documentation, tests, deployment scripts, and demo materials.
+
+Third-party platforms, libraries, brands, and trademarks referenced by this
+project, including Solana, Circle, Supabase, Vercel, Next.js, React, and other
+open-source dependencies, remain the property of their respective owners and are
+used under their own terms and licenses.
