@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { WezaWordmark } from "@/components/brand-logo";
 import { TreasuryStatus } from "@/components/treasury-status";
 
 export const metadata: Metadata = {
@@ -15,13 +16,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white text-ink-900">
       <header className="border-b border-ink-200">
         <div className="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <rect x="2" y="2" width="20" height="20" rx="5" className="fill-ink-950" />
-              <path d="M6 16l3-8 3 6 3-6 3 8" stroke="#34d399" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="font-semibold tracking-tight">WEZA Build</span>
-          </div>
+          <WezaWordmark />
           <div className="flex items-center gap-3 text-sm">
             <Link href="/signup" className="btn-ghost">Create account</Link>
             <Link href="/" className="btn-primary">Sign in</Link>

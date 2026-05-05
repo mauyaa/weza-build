@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { WezaWordmark } from "@/components/brand-logo";
 import type { Profile } from "@/lib/types";
 
 const navByRole: Record<Profile["role"], { href: string; label: string }[]> = {
@@ -35,8 +36,7 @@ export function AppShell({
       <header className="border-b border-ink-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 h-14 flex items-center gap-6">
           <Link href="/app" className="flex items-center gap-2">
-            <Logo />
-            <span className="font-semibold tracking-tight text-ink-900">WEZA Build</span>
+            <WezaWordmark />
           </Link>
           <nav className="flex items-center gap-1 ml-4">
             {nav.map((item) => {
@@ -83,14 +83,5 @@ function RolePill({ role }: { role: Profile["role"] }) {
     <span className={cn("text-[11px] uppercase tracking-wider px-2 py-0.5 rounded-full font-semibold", cls)}>
       {label}
     </span>
-  );
-}
-
-function Logo() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="2" width="20" height="20" rx="5" className="fill-ink-900" />
-      <path d="M6 16l3-8 3 6 3-6 3 8" stroke="#34d399" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

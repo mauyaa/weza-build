@@ -101,4 +101,6 @@ See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the full Vercel + Supabase + 
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — deploy checklist.
 - [`docs/SMOKE_TEST.md`](docs/SMOKE_TEST.md) — post-deploy smoke checks.
 
+- [`docs/BRAND.md`](docs/BRAND.md) - logo assets, colors, voice, and submission copy.
+
 Public `/about` page is the judge-facing marketing surface; it sits outside the authenticated app.
