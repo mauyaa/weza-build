@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 type Role = "owner" | "certifier" | "contractor";
@@ -14,7 +13,6 @@ const roles: { value: Role; title: string; desc: string }[] = [
 ];
 
 export function SignupForm() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,11 +20,6 @@ export function SignupForm() {
   const [organizationName, setOrganizationName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [pending, startTransition] = useTransition();
-
-  useEffect(() => {
-    router.prefetch("/app");
-  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,26 +29,31 @@ export function SignupForm() {
       return;
     }
     setBusy(true);
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        fullName,
-        email,
-        password,
-        role,
-        organizationName: role === "owner" ? organizationName : undefined,
-      }),
-    });
-    const json = await res.json();
-    setBusy(false);
-    if (!json.success) {
-      setError(json.message || "Signup failed");
-      return;
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          role,
+          organizationName: role === "owner" ? organizationName : undefined,
+        }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) {
+        setError(json?.message || "Signup failed");
+        return;
+      }
+      // Force a fresh request so the first /app render sees the new auth cookies.
+      window.location.assign("/app");
+    } catch {
+      setError("Signup failed");
+    } finally {
+      setBusy(false);
     }
-    startTransition(() => {
-      router.push("/app");
-    });
   }
 
   return (
@@ -135,8 +133,8 @@ export function SignupForm() {
 
         {error && <div className="text-sm text-red-600">{error}</div>}
 
-        <button className="btn-primary w-full" type="submit" disabled={busy || pending}>
-          {busy ? "Creating account…" : pending ? "Opening dashboard…" : "Create account"}
+        <button className="btn-primary w-full" type="submit" disabled={busy}>
+          {busy ? "Creating account..." : "Create account"}
         </button>
       </form>
 
