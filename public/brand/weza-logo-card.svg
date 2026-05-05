@@ -1,16 +1,9 @@
 <svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1600" height="900" fill="#070910"/>
-  <circle cx="1390" cy="134" r="320" fill="#34D399" fill-opacity=".16"/>
-  <circle cx="198" cy="784" r="360" fill="#F59E0B" fill-opacity=".13"/>
-  <path d="M1120 788C1285 690 1425 520 1530 278" stroke="#34D399" stroke-opacity=".16" stroke-width="28" stroke-linecap="round"/>
-  <rect x="156" y="156" width="264" height="264" rx="72" fill="#ECFDF5"/>
-  <rect x="180" y="180" width="216" height="216" rx="58" fill="#070910"/>
-  <path d="M227.25 323.25L258.3 240.5L288 305.34L317.7 240.5L348.75 323.25" stroke="#34D399" stroke-width="16.875" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M240.75 340.125H335.25" stroke="#F59E0B" stroke-width="13.5" stroke-linecap="round"/>
-  <circle cx="348.75" cy="237.125" r="13.5" fill="#34D399"/>
-  <text x="156" y="560" fill="#ECFDF5" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="142" font-weight="850" letter-spacing="-7">WEZA Build</text>
-  <text x="164" y="642" fill="#A7F3D0" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="48" font-weight="650" letter-spacing="-1">Approval-to-payout for construction teams.</text>
-  <text x="164" y="720" fill="#D8DDE5" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="32" font-weight="500">Off-chain workflow. On-chain payout proof.</text>
-  <rect x="164" y="760" width="332" height="12" rx="6" fill="#34D399"/>
-  <rect x="514" y="760" width="108" height="12" rx="6" fill="#F59E0B"/>
+  <rect width="1600" height="900" fill="#F7F8FA"/>
+  <rect x="120" y="120" width="228" height="228" rx="56" fill="#0E121C"/>
+  <path d="M177 276.125L205.5 197.75L234 258.313L262.5 197.75L291 276.125" stroke="#34D399" stroke-width="17.8125" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="120" y="520" fill="#0E121C" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="142" font-weight="760" letter-spacing="-7">WEZA Build</text>
+  <text x="128" y="606" fill="#3E4A5E" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="48" font-weight="520">Approval-to-payout for construction teams.</text>
+  <path d="M128 684H526" stroke="#34D399" stroke-width="12" stroke-linecap="round"/>
+  <text x="128" y="756" fill="#5A677C" font-family="Inter, Avenir Next, Arial, sans-serif" font-size="32" font-weight="480">Private workflow. Public payout proof.</text>
 </svg>
