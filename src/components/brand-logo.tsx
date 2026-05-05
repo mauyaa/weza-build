@@ -8,21 +8,14 @@ export function WezaMark({ className }: { className?: string }) {
       className={cn("h-6 w-6 shrink-0", className)}
       fill="none"
     >
-      <rect width="64" height="64" rx="18" fill="#070910" />
+      <rect width="64" height="64" rx="16" fill="#0E121C" />
       <path
-        d="M14 42.5 23.2 18l8.8 19.2L40.8 18 50 42.5"
+        d="M16 43 24 21 32 38 40 21 48 43"
         stroke="#34d399"
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M18 47.5h28"
-        stroke="#f59e0b"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-      <circle cx="50" cy="17" r="4" fill="#34d399" />
     </svg>
   );
 }
