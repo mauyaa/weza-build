@@ -1,4 +1,4 @@
-import { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
+import { Pool, PoolClient, PoolConfig, QueryResult, QueryResultRow } from "pg";
 import { env } from "./env";
 
 /**
@@ -32,6 +32,31 @@ export interface DbDriver {
 let _pool: Pool | null = null;
 let _driver: DbDriver | null = null;
 
+export function poolConfig(connectionString: string): PoolConfig {
+  const sslDisabled = connectionString.includes("sslmode=disable");
+  try {
+    const url = new URL(connectionString);
+    const sslMode = url.searchParams.get("sslmode");
+    const ssl = sslMode === "disable" ? false : { rejectUnauthorized: false };
+
+    for (const key of ["ssl", "sslmode", "sslcert", "sslkey", "sslrootcert"]) {
+      url.searchParams.delete(key);
+    }
+
+    return {
+      connectionString: url.toString(),
+      max: 10,
+      ssl,
+    };
+  } catch {
+    return {
+      connectionString,
+      max: 10,
+      ssl: sslDisabled ? false : { rejectUnauthorized: false },
+    };
+  }
+}
+
 function pgDriver(): DbDriver {
   if (!_pool) {
     const connectionString = env.databaseUrl();
@@ -43,11 +68,7 @@ function pgDriver(): DbDriver {
         "DATABASE_URL is not set. Copy .env.example to .env.local and fill it in."
       );
     }
-    _pool = new Pool({
-      connectionString,
-      max: 10,
-      ssl: connectionString.includes("sslmode=disable") ? false : { rejectUnauthorized: false },
-    });
+    _pool = new Pool(poolConfig(connectionString));
   }
   return {
     async query<T extends QueryResultRow>(text: string, params: unknown[] = []) {

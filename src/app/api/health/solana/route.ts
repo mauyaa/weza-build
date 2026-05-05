@@ -2,6 +2,8 @@ import { fail, ok } from "@/lib/api";
 import { env } from "@/lib/env";
 import { explorerAddress, treasuryStatus } from "@/lib/solana";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   if (env.allowMockSolana()) {
     return ok({
