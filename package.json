@@ -2,6 +2,8 @@
   "name": "weza-build",
   "version": "0.1.0",
   "private": true,
+  "author": "Bevan Mauya Bosire",
+  "license": "UNLICENSED",
   "description": "WEZA Build — approval-to-payout platform for construction teams. Solana devnet payout proof.",
   "scripts": {
     "dev": "next dev -p 3000",

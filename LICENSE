@@ -1,0 +1,23 @@
+Copyright (c) 2026 Bevan Mauya Bosire. All rights reserved.
+
+WEZA Build is proprietary software owned by Bevan Mauya Bosire.
+
+No part of this repository, including source code, product design, database
+schema, documentation, demo content, workflows, branding, or other original
+materials, may be copied, modified, distributed, sublicensed, hosted, sold, or
+used to create a competing product without prior written permission from the
+copyright owner.
+
+Permission is granted only to Colosseum, Solana Frontier Hackathon judges, and
+authorized hackathon reviewers to access, run, and evaluate this repository for
+hackathon judging and accelerator review purposes.
+
+This notice does not restrict the licenses of third-party open-source
+dependencies used by the project. Those dependencies remain governed by their
+own respective licenses.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT
+OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE
+OF THIS SOFTWARE.
