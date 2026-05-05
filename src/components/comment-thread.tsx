@@ -20,7 +20,7 @@ export function CommentThread({
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
 
   async function post() {
     if (!body.trim()) return;
@@ -69,8 +69,8 @@ export function CommentThread({
           />
           {error && <div className="text-sm text-red-600">{error}</div>}
           <div className="flex justify-end">
-            <button type="button" className="btn-ghost" onClick={post} disabled={busy || !body.trim()}>
-              {busy ? "Posting…" : "Post comment"}
+            <button type="button" className="btn-ghost" onClick={post} disabled={busy || pending || !body.trim()}>
+              {busy ? "Posting..." : pending ? "Refreshing..." : "Post comment"}
             </button>
           </div>
         </div>

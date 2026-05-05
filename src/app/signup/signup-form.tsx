@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 
@@ -22,7 +22,11 @@ export function SignupForm() {
   const [organizationName, setOrganizationName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [, startTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    router.prefetch("/app");
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,7 +55,6 @@ export function SignupForm() {
     }
     startTransition(() => {
       router.push("/app");
-      router.refresh();
     });
   }
 
@@ -132,8 +135,8 @@ export function SignupForm() {
 
         {error && <div className="text-sm text-red-600">{error}</div>}
 
-        <button className="btn-primary w-full" type="submit" disabled={busy}>
-          {busy ? "Creating account…" : "Create account"}
+        <button className="btn-primary w-full" type="submit" disabled={busy || pending}>
+          {busy ? "Creating account…" : pending ? "Opening dashboard…" : "Create account"}
         </button>
       </form>
 
