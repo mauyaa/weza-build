@@ -12,3 +12,4 @@ data/*.db-*
 coverage/
 .vercel
 tsconfig.tsbuildinfo
+artifacts/
