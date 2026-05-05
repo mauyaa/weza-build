@@ -16,7 +16,7 @@ export function ReviewPanel({
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<Action | null>(null);
-  const [, startTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
 
   async function run(action: Action) {
     setError(null);
@@ -65,25 +65,25 @@ export function ReviewPanel({
             type="button"
             className="btn-ghost"
             onClick={() => run("reject")}
-            disabled={busy !== null}
+            disabled={busy !== null || pending}
           >
-            {busy === "reject" ? "Rejecting…" : "Reject"}
+            {busy === "reject" ? "Rejecting..." : pending ? "Updating..." : "Reject"}
           </button>
           <button
             type="button"
             className="btn-amber"
             onClick={() => run("request_revision")}
-            disabled={busy !== null}
+            disabled={busy !== null || pending}
           >
-            {busy === "request_revision" ? "Requesting…" : "Request revision"}
+            {busy === "request_revision" ? "Requesting..." : pending ? "Updating..." : "Request revision"}
           </button>
           <button
             type="button"
             className="btn-brand"
             onClick={() => run("approve")}
-            disabled={busy !== null}
+            disabled={busy !== null || pending}
           >
-            {busy === "approve" ? "Approving…" : "Approve milestone"}
+            {busy === "approve" ? "Approving..." : pending ? "Updating..." : "Approve milestone"}
           </button>
         </div>
       </div>

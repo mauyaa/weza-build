@@ -107,7 +107,13 @@ export function SubmitPanel({
         {error && <div className="text-sm text-red-600">{error}</div>}
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink-100">
           <button type="submit" className="btn-brand" disabled={submitting || pending}>
-            {submitting ? "Uploading…" : isResubmit ? `Resubmit v${latestVersion + 1}` : "Submit package"}
+            {submitting
+              ? "Uploading..."
+              : pending
+                ? "Updating..."
+                : isResubmit
+                  ? `Resubmit v${latestVersion + 1}`
+                  : "Submit package"}
           </button>
         </div>
       </form>

@@ -23,7 +23,7 @@ export function PayoutPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [explorer, setExplorer] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
 
   async function trigger() {
     if (!canTrigger) return;
@@ -82,8 +82,12 @@ export function PayoutPanel({
       </dl>
       {role === "owner" && canTrigger && (
         <div className="mt-4 pt-4 border-t border-ink-100">
-          <button type="button" className="btn-brand w-full" disabled={busy} onClick={trigger}>
-            {busy ? "Sending on devnet…" : `Trigger payout · ${formatUsdc(milestone.payout_amount_usdc)}`}
+          <button type="button" className="btn-brand w-full" disabled={busy || pending} onClick={trigger}>
+            {busy
+              ? "Sending on devnet..."
+              : pending
+                ? "Updating payout..."
+                : `Trigger payout · ${formatUsdc(milestone.payout_amount_usdc)}`}
           </button>
           {error && <div className="text-xs text-red-600 mt-2">{error}</div>}
         </div>
