@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const demoAccounts = [
   { email: "owner@weza.build", label: "Amani (Owner)" },
@@ -11,36 +10,34 @@ const demoAccounts = [
 ];
 
 export function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("owner@weza.build");
   const [password, setPassword] = useState("weza1234");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    router.prefetch("/app");
-    router.prefetch("/signup");
-  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setBusy(true);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const json = await res.json();
-    setBusy(false);
-    if (!json.success) {
-      setError(json.message || "Sign-in failed");
-      return;
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ email, password }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) {
+        setError(json?.message || "Sign-in failed");
+        return;
+      }
+      // Force a fresh request so the first /app render sees the new auth cookies.
+      window.location.assign("/app");
+    } catch {
+      setError("Sign-in failed");
+    } finally {
+      setBusy(false);
     }
-    startTransition(() => {
-      router.replace("/app");
-    });
   }
 
   return (
@@ -65,13 +62,13 @@ export function LoginForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder="Password"
             required
           />
         </div>
         {error && <div className="text-sm text-red-600">{error}</div>}
-        <button className="btn-primary w-full" type="submit" disabled={busy || pending}>
-          {busy ? "Signing in..." : pending ? "Opening dashboard..." : "Sign in"}
+        <button className="btn-primary w-full" type="submit" disabled={busy}>
+          {busy ? "Signing in..." : "Sign in"}
         </button>
       </form>
       <div className="mt-4 text-sm text-ink-500">
@@ -80,8 +77,8 @@ export function LoginForm() {
           Create one
         </Link>
       </div>
-      <div className="mt-8 pt-6 border-t border-ink-200">
-        <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Demo accounts</div>
+      <div className="mt-8 border-t border-ink-200 pt-6">
+        <div className="mb-2 text-xs uppercase tracking-wider text-ink-400">Demo accounts</div>
         <div className="space-y-1">
           {demoAccounts.map((a) => (
             <button
@@ -91,13 +88,15 @@ export function LoginForm() {
                 setEmail(a.email);
                 setPassword("weza1234");
               }}
-              className="w-full text-left text-sm px-3 py-2 rounded-md hover:bg-ink-100 border border-ink-200/50 flex items-center justify-between"
+              className="flex w-full items-center justify-between rounded-md border border-ink-200/50 px-3 py-2 text-left text-sm hover:bg-ink-100"
             >
               <span>{a.label}</span>
-              <span className="text-ink-400 mono text-xs">{a.email}</span>
+              <span className="mono text-xs text-ink-400">{a.email}</span>
             </button>
           ))}
-          <div className="text-[11px] text-ink-400 mt-2">Password: <span className="mono">weza1234</span></div>
+          <div className="mt-2 text-[11px] text-ink-400">
+            Password: <span className="mono">weza1234</span>
+          </div>
         </div>
       </div>
     </div>
