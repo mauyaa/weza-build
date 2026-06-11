@@ -11,7 +11,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { loadEnvConfig } from "@next/env";
 import { closePool, query } from "../src/lib/db";
+
+loadEnvConfig(process.cwd());
 
 async function main() {
   const dir = path.join(process.cwd(), "supabase", "migrations");

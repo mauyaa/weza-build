@@ -14,11 +14,14 @@
  * the live flow produces.
  */
 import { Keypair } from "@solana/web3.js";
+import { loadEnvConfig } from "@next/env";
 import crypto from "node:crypto";
 import { closePool, query, withTx } from "../src/lib/db";
 import { supabaseService } from "../src/lib/supabase-service";
 import { addComment, decide, submitPackage, writeAudit } from "../src/lib/repo";
 import type { Profile } from "../src/lib/types";
+
+loadEnvConfig(process.cwd());
 
 const ALL_EMAILS = [
   "owner@weza.build",
