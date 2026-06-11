@@ -7,7 +7,7 @@ Two videos, both under 3 minutes. Record in this exact order. Each row is a shot
 
 Do not improvise. Colosseum judges watch dozens of these in a row; deviation almost always makes the video worse, not better.
 
-Before recording: run `/api/health/solana` once and confirm `mode: live`, `lamports >= 100_000_000`, `usdcUi >= 1000`. Screenshot the JSON. Keep that screenshot — it's shot 3 of the technical demo.
+Before recording: run `/api/health/solana` once and confirm `mode: live`, `lamports >= 10_000_000`, `usdcUi >= 5`. Screenshot the JSON. Keep that screenshot — it's shot 3 of the technical demo.
 
 ---
 
@@ -51,8 +51,8 @@ Before recording: run `npm run seed` against the live Supabase project, log into
 | 5 | 0:55–1:15 | Certifier: click Request revision with a note. | "Certifier requests a revision. Ball flips to contractor." | Note: "tighten rebar spec." Click Request revision. |
 | 6 | 1:15–1:30 | Contractor window. | "Contractor resubmits v2." | Drop another file, click Resubmit. |
 | 7 | 1:30–1:50 | Certifier window. Click Approve. | "Certifier approves. One transaction: submission approved, milestone approved, payout ready, three audit rows." | Click Approve milestone. |
-| 8 | 1:50–2:10 | Owner window, payout panel. | "Owner's turn. One click." | Click **Trigger payout · 120,000 USDC**. |
-| 9 | 2:10–2:25 | Zoom on the Settled banner, then click **View on Explorer**. | "Devnet tx. Two instructions. Memo program carrying the milestone context. SPL TransferChecked of 120,000 USDC. Anyone can verify which approval caused this transfer." | Click Explorer link. Expand Memo + Token Balances. Let it breathe for 5 seconds. |
+| 8 | 1:50–2:10 | Owner window, payout panel. | "Owner's turn. One click." | Click **Trigger payout · 4 USDC**. |
+| 9 | 2:10–2:25 | Zoom on the Solana proof card, then click **Open Solana Explorer (Devnet)**. | "Real devnet transaction. Two instructions. Memo program carrying the milestone context. SPL TransferChecked of a demo-sized amount. Anyone can verify which approval caused this transfer." | Click Explorer link. Expand Memo + Token Balances. Let it breathe for 5 seconds. |
 | 10 | 2:25–2:30 | Back to milestone page. | "Approval-to-payout. Off-chain workflow, on-chain proof. That's it." | End. |
 
 **Recording tips**

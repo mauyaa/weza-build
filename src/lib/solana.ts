@@ -37,6 +37,13 @@ const DEVNET_USDC_MINT = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJD
 const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 const USDC_DECIMALS = 6;
 
+export function safeSolanaError(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  return message
+    .replace(/https?:\/\/[^\s)]+/gi, "[redacted RPC endpoint]")
+    .replace(/api-key=[^&\s]+/gi, "api-key=[redacted]");
+}
+
 export interface OnChainPayoutArgs {
   amountUsdc: number;
   recipient: string;
@@ -84,7 +91,7 @@ function loadTreasury(): Keypair {
   } catch (err) {
     throw new Error(
       `SOLANA_TREASURY_KEYPAIR is set but not a valid JSON secret-key array: ${
-        err instanceof Error ? err.message : String(err)
+        safeSolanaError(err)
       }`
     );
   }
@@ -118,7 +125,6 @@ function buildMemoInstruction(payload: OnChainPayoutArgs["memo"]): { ix: Transac
 export interface TreasuryStatus {
   publicKey: string;
   lamports: number;
-  rpcUrl: string;
   cluster: string;
   usdcAta: string | null;
   usdcAtomic: string;
@@ -141,7 +147,6 @@ export async function treasuryStatus(): Promise<TreasuryStatus> {
   return {
     publicKey: kp.publicKey.toBase58(),
     lamports,
-    rpcUrl: env.solanaRpcUrl(),
     cluster: env.solanaCluster(),
     usdcAta: ata.toBase58(),
     usdcAtomic,
@@ -178,7 +183,7 @@ export async function performDevnetPayoutProof(args: OnChainPayoutArgs): Promise
   // Treasury SOL sanity (fees + any ATA rent).
   const balance = await conn.getBalance(payer.publicKey).catch((err) => {
     throw new Error(
-      `Solana RPC unreachable (${env.solanaRpcUrl()}): ${err instanceof Error ? err.message : String(err)}`
+      `Solana RPC unreachable: ${safeSolanaError(err)}`
     );
   });
   if (balance < 10_000) {
@@ -194,7 +199,7 @@ export async function performDevnetPayoutProof(args: OnChainPayoutArgs): Promise
     treasuryAta = await getOrCreateAssociatedTokenAccount(conn, payer, DEVNET_USDC_MINT, payer.publicKey);
   } catch (err) {
     throw new Error(
-      `Treasury USDC ATA unreachable: ${err instanceof Error ? err.message : String(err)}. ` +
+      `Treasury USDC ATA unreachable: ${safeSolanaError(err)}. ` +
         `Mint devnet USDC at https://faucet.circle.com to the treasury address.`
     );
   }

@@ -26,9 +26,9 @@ curl -s "$BASE/api/health/config" | jq
 curl -s "$BASE/api/health/solana" | jq
 ```
 
-**Pass:** `data.mode == "live"`, `data.lamports >= 10_000_000` (≈ 0.01 SOL), `data.usdcUi >= 1000`, `data.cluster == "devnet"`.
+**Pass:** `data.mode == "live"`, `data.lamports >= 10_000_000` (≈ 0.01 SOL), `data.usdcUi >= 5`, `data.cluster == "devnet"`.
 
-**Fail:** `mode: mock` (production env mis-set), `treasury_unavailable` (RPC or treasury not configured), `lamports` low (SOL airdrop), or `usdcUi` low (top up from <https://faucet.circle.com>).
+**Fail:** `mode: mock` (production env mis-set), `treasury_unavailable` (RPC or treasury not configured), `lamports` low (SOL airdrop), or `usdcUi` below the demo payout amount (top up from <https://faucet.circle.com>).
 
 ## 3. Signup + Supabase Auth + profile trigger
 
@@ -93,7 +93,7 @@ curl -s -c /tmp/c -X POST "$BASE/api/auth/login" \
 curl -s -b /tmp/c -X POST "$BASE/api/milestones/$MID/payout" | jq '{status: .data.payout.status, sig: .data.payout.tx_signature, explorer: .data.explorer_url}'
 ```
 
-**Pass:** `status == "confirmed"`, `sig` is a ~88-char base58 string (not starting with `MOCK_`), and opening `explorer` loads the transaction on Solana Explorer devnet. The Explorer view should show **two instructions**: a Memo instruction with a JSON payload (`app:"weza-build"`, `project`, `milestone`, `milestone_id`, `submission_id`, `approved_by`) and an SPL-Token `TransferChecked` for the USDC mint (`4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`).
+**Pass:** `status == "confirmed"`, `sig` is a ~88-char base58 string (not starting with `MOCK_`), and opening `explorer` loads the transaction on Solana Explorer devnet. The app must also show the full signature in the payout panel and milestone/payment audit trail. The Explorer view should show **two instructions**: a Memo instruction with a JSON payload (`app:"weza-build"`, `project`, `milestone`, `milestone_id`, `submission_id`, `approved_by`) and an SPL-Token `TransferChecked` for the USDC mint (`4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`).
 
 **Idempotency:**
 

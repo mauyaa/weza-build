@@ -34,7 +34,7 @@ export async function dashboardKpis(profile: Profile): Promise<DashboardKpis> {
          JOIN milestones m ON m.id = s.milestone_id
          WHERE m.project_id IN (SELECT id FROM scope) AND s.status = 'revision_requested')::int AS revision_requested,
       (SELECT COUNT(*) FROM milestones m
-         WHERE m.project_id IN (SELECT id FROM scope) AND m.payout_status = 'ready')::int AS payout_ready,
+         WHERE m.project_id IN (SELECT id FROM scope) AND m.payout_status IN ('ready','failed'))::int AS payout_ready,
       (SELECT COUNT(*) FROM milestones m
          WHERE m.project_id IN (SELECT id FROM scope) AND m.status = 'settled')::int AS settled,
       (SELECT COALESCE(SUM(m.payout_amount_usdc), 0)::float FROM milestones m
@@ -50,6 +50,7 @@ export interface ActionItem {
     | "revision_required"
     | "review_required"
     | "payout_ready"
+    | "payout_failed"
     | "payout_triggered";
   project_id: string;
   project_name: string;
@@ -67,7 +68,7 @@ export async function actionQueue(profile: Profile, limit = 8): Promise<ActionIt
       SELECT
         CASE
           WHEN m.status = 'awaiting_submission' THEN 'submit_required'
-          WHEN s.status = 'revision_requested' THEN 'revision_required'
+          WHEN s.status IN ('revision_requested','rejected') THEN 'revision_required'
           ELSE 'submit_required'
         END AS kind,
         p.id AS project_id, p.name AS project_name,
@@ -113,6 +114,7 @@ export async function actionQueue(profile: Profile, limit = 8): Promise<ActionIt
     `
     SELECT
       CASE WHEN m.payout_status = 'ready' THEN 'payout_ready'
+           WHEN m.payout_status = 'failed' THEN 'payout_failed'
            WHEN m.payout_status = 'triggered' THEN 'payout_triggered'
            ELSE 'payout_ready' END AS kind,
       p.id AS project_id, p.name AS project_name,
@@ -123,7 +125,7 @@ export async function actionQueue(profile: Profile, limit = 8): Promise<ActionIt
     FROM milestones m
     JOIN projects p ON p.id = m.project_id
     WHERE p.org_id = $1 AND p.owner_id = $2
-      AND m.payout_status IN ('ready','triggered')
+      AND m.payout_status IN ('ready','failed','triggered')
     ORDER BY m.updated_at DESC
     LIMIT $3
     `,

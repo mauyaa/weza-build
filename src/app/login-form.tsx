@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 
 const demoAccounts = [
-  { email: "owner@weza.build", label: "Amani (Owner)" },
-  { email: "certifier@weza.build", label: "Zanele (Certifier)" },
   { email: "contractor@weza.build", label: "Kofi (Contractor)" },
+  { email: "certifier@weza.build", label: "Zanele (Certifier)" },
+  { email: "owner@weza.build", label: "Amani (Owner)" },
 ];
 
 export function LoginForm() {
-  const [email, setEmail] = useState("owner@weza.build");
+  const [email, setEmail] = useState("contractor@weza.build");
   const [password, setPassword] = useState("weza1234");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -43,6 +43,13 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-sm">
       <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
+      <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+        <div className="text-xs font-semibold uppercase tracking-wider text-emerald-800">Try the demo</div>
+        <p className="mt-2 text-sm leading-relaxed text-emerald-950">
+          Contractor submits -&gt; Certifier approves -&gt; Owner triggers payout -&gt; view the
+          Solana transaction signature and milestone/payment audit record.
+        </p>
+      </div>
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label className="label">Email</label>
@@ -78,7 +85,7 @@ export function LoginForm() {
         </Link>
       </div>
       <div className="mt-8 border-t border-ink-200 pt-6">
-        <div className="mb-2 text-xs uppercase tracking-wider text-ink-400">Demo accounts</div>
+        <div className="mb-2 text-xs uppercase tracking-wider text-ink-400">Demo accounts - use in this order</div>
         <div className="space-y-1">
           {demoAccounts.map((a) => (
             <button

@@ -18,7 +18,7 @@ export default async function Dashboard() {
   ]);
 
   const roleTitle = {
-    owner: "Payout cockpit",
+    owner: "Solana payout cockpit",
     certifier: "Review desk",
     contractor: "Build queue",
   }[profile.role];
@@ -36,7 +36,7 @@ export default async function Dashboard() {
         <Kpi label="Active projects" value={kpis.active_projects} />
         <Kpi label="Pending review" value={kpis.pending_review} tone="blue" />
         <Kpi label="Revision requested" value={kpis.revision_requested} tone="amber" />
-        <Kpi label="Payout ready" value={kpis.payout_ready} tone="amber" />
+        <Kpi label="Payout action" value={kpis.payout_ready} tone="amber" />
         <Kpi label="Settled" value={kpis.settled} tone="green" />
         <Kpi
           label="Value settled"
@@ -50,7 +50,9 @@ export default async function Dashboard() {
         <div className="lg:col-span-2 space-y-3">
           <h2 className="text-sm font-semibold text-ink-700">Next up</h2>
           {queue.length === 0 ? (
-            <div className="card p-6 text-sm text-ink-500 text-center">Nothing waiting on you.</div>
+            <div className="card p-6 text-sm text-ink-500 text-center">
+              No actions waiting. Open Projects to inspect milestones or Audit to verify Solana proof.
+            </div>
           ) : (
             <div className="space-y-2">
               {queue.map((item) => (

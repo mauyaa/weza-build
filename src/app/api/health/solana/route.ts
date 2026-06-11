@@ -1,6 +1,6 @@
 import { fail, ok } from "@/lib/api";
 import { env } from "@/lib/env";
-import { explorerAddress, treasuryStatus } from "@/lib/solana";
+import { explorerAddress, safeSolanaError, treasuryStatus } from "@/lib/solana";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,7 @@ export async function GET() {
   if (env.allowMockSolana()) {
     return ok({
       mode: "mock",
-      rpcUrl: env.solanaRpcUrl(),
+      rpcConfigured: Boolean(env.solanaRpcUrl()),
       cluster: env.solanaCluster(),
       note: "WEZA_MOCK_SOLANA=1 in non-production; payouts return a synthetic signature.",
     });
@@ -23,7 +23,7 @@ export async function GET() {
       usdc_mint_explorer: explorerAddress(status.usdcMint),
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = safeSolanaError(err);
     return fail(message, "treasury_unavailable", 503);
   }
 }

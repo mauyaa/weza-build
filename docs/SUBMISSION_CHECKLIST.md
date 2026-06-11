@@ -34,7 +34,7 @@ Every item here maps to a concrete action you take outside the codebase. Check t
 
 - [ ] `solana-keygen new --outfile treasury.json --no-bip39-passphrase`.
 - [ ] `solana airdrop 2 $(solana-keygen pubkey treasury.json) --url devnet` — retry until balance ≥ 2 SOL.
-- [ ] Mint devnet USDC: open <https://faucet.circle.com>, select **Solana Devnet**, paste the treasury address, request `100000` (devnet USDC; it's funny money).
+- [ ] Mint devnet USDC: open <https://faucet.circle.com>, select **Solana Devnet**, paste the treasury address, and keep at least `20` devnet USDC available for repeated proof transactions.
 - [ ] Confirm balances on <https://explorer.solana.com/address/...?cluster=devnet>.
 - [ ] Copy the contents of `treasury.json` (the 64-number array) — this is `SOLANA_TREASURY_KEYPAIR`.
 - [ ] **Do not commit `treasury.json`.**
@@ -75,7 +75,7 @@ From your laptop, with the live envs loaded:
 Walk through `docs/SMOKE_TEST.md` end to end.
 
 - [ ] §1 `/api/health/config` returns `success: true`, no missing env, database connected, missingTables empty.
-- [ ] §2 `/api/health/solana` returns `mode: live`, usdcUi ≥ 1000.
+- [ ] §2 `/api/health/solana` returns `mode: live`, usdcUi ≥ 5.
 - [ ] §3 signup creates auth user + profile.
 - [ ] §4 login succeeds, wrong password is rejected.
 - [ ] §5 full loop runs, produces a real 88-char base58 signature.

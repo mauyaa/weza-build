@@ -1,106 +1,140 @@
 # WEZA Build
 
-**Approval-to-payout platform for construction teams.**
+**Approval-to-payout infrastructure for construction projects, with verifiable Solana payout proof.**
 
-WEZA Build turns construction milestone approval into a tracked workflow that moves directly into a real payout on Solana devnet. Drawings and revisions live off-chain; the payout moment is the on-chain moment.
+WEZA links a construction milestone approval to a real Solana devnet transaction signature and a permanent audit record. Drawings, review notes, and revisions stay private off-chain. The payout proof is public and independently verifiable.
 
-**Live deployment:** [https://weza-build.vercel.app](https://weza-build.vercel.app)
+- **Live MVP:** [https://weza-build.vercel.app](https://weza-build.vercel.app)
+- **GitHub:** [https://github.com/mauyaa/weza-build](https://github.com/mauyaa/weza-build)
+- **Demo walkthrough:** [`docs/DEMO_WALKTHROUGH.md`](docs/DEMO_WALKTHROUGH.md)
 
-## Ownership and license
+## Try the live demo
 
-WEZA Build is a solo-founder project designed, built, and shipped by **Bevan Mauya Bosire** for the Solana Frontier Hackathon.
+Use the accounts in this order. Password for all three: `weza1234`.
 
-Copyright (c) 2026 Bevan Mauya Bosire. All rights reserved. This repository is proprietary and shared for hackathon judging and accelerator review. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+| Step | Role | Account | Action |
+| --- | --- | --- | --- |
+| 1 | Contractor | `contractor@weza.build` | Submit a milestone/drawing package |
+| 2 | Certifier | `certifier@weza.build` | Approve the submitted package |
+| 3 | Owner | `owner@weza.build` | Trigger the Solana devnet payout |
+| 4 | Any role | same accounts | Open the full transaction signature and milestone/payment audit trail |
 
-## What it does
+The reviewer should see:
 
-One loop, end to end:
-
+```text
+Contractor submission
+  -> Certifier approval
+  -> Owner payout authorization
+  -> Solana devnet transaction confirmation
+  -> Full signature recorded in the audit trail
 ```
-submit drawing / evidence
-  → certifier review
-  → request revision (optional)
-  → resubmit new version
-  → milestone approved
-  → owner triggers payout
-  → Solana devnet transaction runs
-  → tx signature stored in audit trail
-```
 
-Three roles that see only what they need:
+Devnet payout amounts are intentionally demo-sized so the complete flow can be repeated from a faucet-funded treasury. They are proof transactions, not mainnet settlement.
 
-- **Owner** — approved milestones, payout queue, settled work.
-- **Certifier** — submissions awaiting review, revision requests.
-- **Contractor** — packages to submit, revisions to address.
+## What WEZA is
 
-## What it is not
+WEZA is an approval-to-payout platform for construction teams:
 
-- Not a bank settlement rail (USDC amounts are the authoritative off-chain record).
-- Not real KYC / escrow / custody.
-- Not an AI product.
-- Not a marketplace, mobile app, or generic wallet.
+- Contractors submit evidence packages and resubmit revisions.
+- Certifiers approve, reject, or request revision on an exact version.
+- Owners can trigger payout only after certifier approval.
+- Confirmed Solana signatures become part of the milestone/payment audit record.
+
+The backend enforces these rules. A payout cannot be triggered before approval or broadcast twice. A failed or unconfirmed payout remains failed and never appears as successful proof.
 
 ## Why Solana
 
-Construction payouts need durable public proof. WEZA Build runs that moment on Solana devnet and stores the transaction signature in the audit trail. Drawings, comments, and revision history stay off-chain — they do not belong on a public ledger.
+Construction payment disputes often start with a missing link between approval and payment. WEZA creates that link:
 
-## Stack
+1. The certifier approves a specific submission version in WEZA.
+2. The owner triggers the approved payout.
+3. WEZA broadcasts a devnet USDC `TransferChecked` transaction with a Memo instruction.
+4. The memo links the transaction to the project, milestone, submission, and approver.
+5. WEZA stores the confirmed transaction signature in the audit trail.
 
-- **Next.js 14 App Router** (TypeScript, Tailwind)
-- **Supabase Postgres** with SQL migrations
-- **Supabase Auth** (email + password) with a `handle_new_user` trigger provisioning profiles + orgs
-- **Supabase Storage** (private `submissions` bucket, short-lived signed URLs)
-- **Row-Level Security** on every user-facing table; all writes flow through server route handlers using the service-role key
-- **Solana devnet** via `@solana/web3.js` with a pre-funded treasury keypair
-- **Vitest** + `pglite` for in-process Postgres testing
+The workflow stays off-chain because drawings and review discussions should remain private. The payout moment goes on-chain because payment proof should be durable and independently verifiable.
 
-## Local development
+## Current status
+
+**Live MVP deployed.** The repository includes:
+
+- Three role-aware demo accounts
+- Submission versioning and revision loops
+- Approval-gated payouts
+- Real Solana devnet payout proof
+- Full transaction signature and Explorer link
+- Milestone/payment audit trail
+- Duplicate payout protection and failure recovery
+- Automated state-machine, authorization, database, and payout tests
+
+## Tech stack
+
+- Next.js 14 App Router, React, TypeScript, Tailwind CSS
+- Supabase Auth, Postgres, Storage, and Row-Level Security
+- Solana devnet via `@solana/web3.js` and `@solana/spl-token`
+- Devnet USDC `TransferChecked` plus Memo Program instruction
+- Vitest and pglite for isolated Postgres tests
+- Vercel deployment
+
+## Local setup
+
+Requirements: Node.js 20+, a Supabase project, and a funded Solana devnet treasury.
 
 ```bash
-cp .env.example .env.local
-# fill in Supabase URL, anon key, service role key, DATABASE_URL, SOLANA_TREASURY_KEYPAIR
-
 npm install
-npm run db:migrate    # applies supabase/migrations/*.sql
-npm run seed          # populates realistic demo data via service-role auth admin
+cp .env.example .env.local
+# Fill in Supabase, DATABASE_URL, and Solana treasury values.
+
+npm run db:migrate
+npm run seed
+npm test
 npm run dev
 ```
 
-Then open <http://localhost:3000> and sign in with `owner@weza.build` / `weza1234`.
+Open [http://localhost:3000](http://localhost:3000).
 
-For offline development without a devnet treasury, set `WEZA_MOCK_SOLANA=1`. **This flag is ignored in production** — the env loader refuses to honour it when `NODE_ENV=production`.
+For local UI work without broadcasting transactions, set `WEZA_MOCK_SOLANA=1`. Mock mode is refused in production.
 
-## Tests
+## Verification
 
 ```bash
 npm test
+npm run build
 ```
 
-Runs against an in-process Postgres (pglite, WASM) so no Docker is required. Covers:
+The critical tests cover:
 
-- submission / milestone / payout state machine transitions
-- full submit → revise → resubmit → approve → payout loop
-- duplicate approve + duplicate payout idempotency (no re-broadcast)
-- role enforcement (contractor cannot trigger a payout)
-- payout failure + retry (milestone recoverable)
-- signup metadata contract with `handle_new_user`
+- Contractor submit/resubmit rules
+- Certifier approve/reject/request-revision permissions
+- Owner-only payout after approval
+- Duplicate approve and duplicate payout idempotency
+- Failed and unconfirmed payout handling
+- Transaction signature persistence
+- Audit creation for every major action
 
-## Deployment
+For deployed verification, follow [`docs/SMOKE_TEST.md`](docs/SMOKE_TEST.md).
 
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the full Vercel + Supabase + devnet treasury checklist, and [`docs/SMOKE_TEST.md`](docs/SMOKE_TEST.md) for the post-deploy verification sequence.
+## Repository structure
 
-## Documents
+```text
+src/app/          Next.js pages and server route handlers
+src/components/   Role workflow, payout proof, and audit UI
+src/lib/          Domain rules, state machine, database, Solana integration
+supabase/         SQL migrations and RLS policies
+scripts/          Migration, seeding, and treasury setup
+tests/            State-machine, authorization, database, and full-flow tests
+docs/             Demo, deployment, release, pitch, and risk documentation
+public/brand/     WEZA brand assets
+```
 
-- [`docs/PITCH.md`](docs/PITCH.md) — 3-min pitch + 2-to-3-min technical demo scripts.
-- [`docs/HACKATHON_CANVAS.md`](docs/HACKATHON_CANVAS.md) — Colosseum canvas.
-- [`docs/TRACTION.md`](docs/TRACTION.md) — market evidence + design-partner template.
-- [`docs/RISK_REGISTER.md`](docs/RISK_REGISTER.md) — honest risk list + mitigations.
-- [`docs/FRONTEND_BACKEND_CONTRACT.md`](docs/FRONTEND_BACKEND_CONTRACT.md) — API envelope, endpoints, effects.
-- [`docs/DEMO_WALKTHROUGH.md`](docs/DEMO_WALKTHROUGH.md) — 2-minute demo script.
-- [`docs/RELEASE_READINESS.md`](docs/RELEASE_READINESS.md) — scope, non-goals, known limits.
-- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — deploy checklist.
-- [`docs/SMOKE_TEST.md`](docs/SMOKE_TEST.md) — post-deploy smoke checks.
+## What grant support will fund
 
-- [`docs/BRAND.md`](docs/BRAND.md) - logo assets, colors, voice, and submission copy.
+Grant support will fund an AI coding subscription used to harden and ship the real product codebase: stronger automated verification, production monitoring, security review, payout reliability, deployment tooling, and faster iteration with construction design partners.
 
-Public `/about` page is the judge-facing marketing surface; it sits outside the authenticated app.
+The proposed next phase is documented in [`docs/SUPERTEAM_AGENTIC_ENGINEERING_GRANT.md`](docs/SUPERTEAM_AGENTIC_ENGINEERING_GRANT.md): AI-assisted milestone verification with human certifier accountability, followed by an audited Anchor escrow program.
+
+## Ownership and license
+
+WEZA Build is a solo-founder project designed, built, and shipped by **Bevan Mauya Bosire**.
+
+Copyright (c) 2026 Bevan Mauya Bosire. All rights reserved. This repository is proprietary and shared for grant, hackathon, and accelerator review. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).

@@ -60,7 +60,7 @@ function resolve(p: Props): { who: string; verb: string; tone: "blue" | "amber" 
     return { who: contractorName, verb: "resubmit", tone: "amber" };
   }
   if (submissionStatus === "rejected") {
-    return { who: contractorName, verb: "rejected — open dispute", tone: "ink" };
+    return { who: contractorName, verb: "resubmit after rejection", tone: "amber" };
   }
   return { who: contractorName, verb: "submit package", tone: "blue" };
 }

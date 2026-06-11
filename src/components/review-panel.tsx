@@ -29,19 +29,24 @@ export function ReviewPanel({
       return;
     }
     setBusy(action);
-    const res = await fetch(`/api/submissions/${submissionId}/decision`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action, note }),
-    });
-    const json = await res.json();
-    setBusy(null);
-    if (!json.success) {
-      setError(json.message || "Decision failed");
-      return;
+    try {
+      const res = await fetch(`/api/submissions/${submissionId}/decision`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action, note }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) {
+        setError(json?.message || "Decision failed");
+        return;
+      }
+      setNote("");
+      startTransition(() => router.refresh());
+    } catch {
+      setError("Decision could not reach the server. Try again.");
+    } finally {
+      setBusy(null);
     }
-    setNote("");
-    startTransition(() => router.refresh());
   }
 
   return (
@@ -50,6 +55,9 @@ export function ReviewPanel({
         <h2 className="text-sm font-semibold text-ink-700">Decision · v{currentVersion}</h2>
       </div>
       <div className="space-y-4">
+        <p className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-900">
+          Approve unlocks owner payout. Revision or rejection returns the milestone to the contractor for resubmission.
+        </p>
         <div>
           <label className="label">Decision note</label>
           <textarea
@@ -63,7 +71,7 @@ export function ReviewPanel({
         <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-ink-100">
           <button
             type="button"
-            className="btn-ghost"
+            className="btn-danger"
             onClick={() => run("reject")}
             disabled={busy !== null || pending}
           >

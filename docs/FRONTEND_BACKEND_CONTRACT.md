@@ -91,7 +91,7 @@ Powers the live cross-role audit rail. Returns `{ events, milestone: { status, p
 
 ### `GET /api/health/solana`
 
-Returns `{ mode, publicKey, lamports, rpcUrl, cluster, explorer }` or `mode: "mock"` in non-production dev. Fails with `treasury_unavailable` if the treasury env is missing or the RPC is unreachable.
+Returns `{ mode, publicKey, lamports, cluster, explorer }` or `mode: "mock"` in non-production dev. The secret-bearing RPC URL is never returned. Fails with `treasury_unavailable` if the treasury env is missing or the RPC is unreachable.
 
 ### `GET /api/health/config`
 

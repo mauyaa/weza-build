@@ -96,7 +96,7 @@ export function LiveMilestoneAudit({ milestoneId, initial }: Props) {
             flashIds.has(e.id) ? "bg-emerald-50" : "bg-transparent"
           }`}
         >
-          <AuditRow event={e} compact />
+          <AuditRow event={e} compact showProof />
         </div>
       ))}
     </div>

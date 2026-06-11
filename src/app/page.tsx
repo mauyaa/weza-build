@@ -16,8 +16,20 @@ export default async function LoginPage() {
             <span className="text-xl font-semibold tracking-tight">WEZA Build</span>
           </div>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight">
-            Approval-to-payout<br />for construction.
+            Approval becomes<br />verifiable payout proof.
           </h1>
+          <p className="mt-5 text-base leading-relaxed text-ink-300">
+            WEZA uses Solana for verifiable payout proof linked directly to construction milestone approvals.
+          </p>
+          <div className="mt-8 rounded-xl border border-white/15 bg-white/5 p-5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-brand-300">Try the demo flow</div>
+            <ol className="mt-3 space-y-2 text-sm text-ink-200">
+              <li><span className="mono text-brand-300">1.</span> Contractor submits a milestone package</li>
+              <li><span className="mono text-brand-300">2.</span> Certifier approves the submission</li>
+              <li><span className="mono text-brand-300">3.</span> Owner triggers the Solana payout</li>
+              <li><span className="mono text-brand-300">4.</span> Open the signature and audit trail</li>
+            </ol>
+          </div>
           <div className="mt-10">
             <a
               href="/about"

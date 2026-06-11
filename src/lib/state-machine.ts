@@ -39,7 +39,7 @@ const submissionTransitions: Record<SubmissionStatus, SubmissionStatus[]> = {
   revision_requested: ["resubmitted"],
   resubmitted: ["under_review"],
   approved: [],
-  rejected: [],
+  rejected: ["resubmitted"],
 };
 
 const milestoneTransitions: Record<MilestoneStatus, MilestoneStatus[]> = {

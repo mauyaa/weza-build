@@ -31,12 +31,29 @@ export default function AboutPage() {
               Approval-to-payout<br />for construction.
             </h1>
             <p className="mt-6 text-lg text-ink-600 leading-relaxed">
-              Drawings, revisions, and milestone sign-off move directly into payout — on Solana devnet, with a permanent audit trail. Workflow stays off-chain. Payment proof happens on-chain.
+              WEZA uses Solana for verifiable payout proof linked to construction milestone approvals. Approval happens in WEZA, the owner triggers payout, the Solana transaction signature is recorded, and the audit trail updates.
             </p>
             <div className="mt-10 flex gap-3">
               <Link href="/signup" className="btn-primary">Create an account</Link>
               <Link href="/" className="btn-ghost">Sign in</Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-ink-200 bg-emerald-50">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-emerald-800">Try the live demo flow</h2>
+              <ol className="mt-4 grid gap-2 text-sm text-emerald-950 md:grid-cols-2">
+                <li><span className="mono font-semibold">1.</span> Login as Contractor and submit a milestone package</li>
+                <li><span className="mono font-semibold">2.</span> Login as Certifier and approve the submission</li>
+                <li><span className="mono font-semibold">3.</span> Login as Owner and trigger the Solana payout</li>
+                <li><span className="mono font-semibold">4.</span> View the full signature and payment audit record</li>
+              </ol>
+            </div>
+            <Link href="/" className="btn-brand shrink-0">Start with Contractor</Link>
           </div>
         </div>
       </section>
