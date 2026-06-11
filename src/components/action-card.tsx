@@ -24,6 +24,11 @@ const config: Record<ActionItem["kind"], { label: string; cta: string; tone: str
     cta: "Trigger payout",
     tone: "border-l-emerald-400",
   },
+  payout_failed: {
+    label: "Payout needs retry",
+    cta: "Review & retry",
+    tone: "border-l-red-400",
+  },
   payout_triggered: {
     label: "Payout in flight",
     cta: "Open",

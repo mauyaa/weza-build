@@ -92,7 +92,7 @@ The seed script:
 
 - Deletes and recreates `owner@weza.build`, `certifier@weza.build`, `contractor@weza.build` (password `weza1234`) via the service-role Auth Admin API.
 - Fires the `handle_new_user` trigger, which provisions a profile and org for each.
-- Creates two projects with milestones in every state (settled / under review / payout ready / awaiting).
+- Creates two projects with milestones under review, payout ready, and awaiting submission. The first live payout creates the settled state and real signature.
 
 ## 6. Deploy the Next.js app to Vercel
 
@@ -129,7 +129,6 @@ Then open `https://YOUR-DEPLOY.vercel.app/api/health/solana`. You should see:
     "mode": "live",
     "publicKey": "<treasury base58>",
     "lamports": 5000000000,
-    "rpcUrl": "https://rpc.helius.xyz/...",
     "cluster": "devnet",
     "explorer": "https://explorer.solana.com/address/<pubkey>?cluster=devnet"
   }

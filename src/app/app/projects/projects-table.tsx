@@ -41,8 +41,8 @@ export function ProjectsTable({
         </span>
       </div>
 
-      <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="card overflow-x-auto">
+        <table className="min-w-[960px] w-full text-sm">
           <thead className="bg-ink-50 border-b border-ink-200 text-xs uppercase tracking-wider text-ink-500">
             <tr>
               <th className="text-left px-4 py-3 font-semibold">Project</th>

@@ -12,7 +12,7 @@ import {
   listDecisions,
   listVersions,
 } from "@/lib/repo";
-import { formatDate, formatUsdc, shortSig } from "@/lib/format";
+import { formatDate, formatUsdc } from "@/lib/format";
 import { MilestoneChip, PayoutChip, SubmissionChip } from "@/components/status-chip";
 import { SubmitPanel } from "@/components/submit-panel";
 import { ReviewPanel } from "@/components/review-panel";
@@ -21,6 +21,7 @@ import { VersionHistory } from "@/components/version-history";
 import { CommentThread } from "@/components/comment-thread";
 import { LiveMilestoneAudit } from "@/components/live-audit";
 import { HandoffPill } from "@/components/handoff-pill";
+import { SolanaProof } from "@/components/solana-proof";
 
 export default async function MilestonePage({ params }: { params: { id: string } }) {
   const profile = await getCurrentProfile();
@@ -103,7 +104,7 @@ export default async function MilestonePage({ params }: { params: { id: string }
             contractorName={contractor.full_name}
           />
           <div className="text-right">
-            <div className="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Payout</div>
+            <div className="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Devnet proof payout</div>
             <div className="mono font-semibold text-xl">{formatUsdc(milestone.payout_amount_usdc)}</div>
           </div>
         </div>
@@ -176,29 +177,7 @@ export default async function MilestonePage({ params }: { params: { id: string }
 }
 
 function SettledBanner({ signature, amount }: { signature: string; amount: number }) {
-  return (
-    <div className="card border-emerald-200 bg-emerald-50/60 p-5 flex items-center gap-4">
-      <div className="h-10 w-10 rounded-full bg-emerald-500 text-white flex items-center justify-center text-lg">
-        ✓
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-emerald-900">
-          Settled on Solana devnet · {formatUsdc(amount)}
-        </div>
-        <div className="text-xs text-emerald-800/80 mt-0.5">
-          Tx <span className="mono">{shortSig(signature, 10)}</span>
-        </div>
-      </div>
-      <a
-        href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
-        target="_blank"
-        rel="noreferrer"
-        className="btn-brand shrink-0"
-      >
-        View on Explorer
-      </a>
-    </div>
-  );
+  return <SolanaProof signature={signature} amount={amount} />;
 }
 
 function WorkflowTimeline({
@@ -244,8 +223,8 @@ function WorkflowTimeline({
     },
   ];
   return (
-    <div className="card p-4">
-      <div className="flex items-center gap-2">
+    <div className="card overflow-x-auto p-4">
+      <div className="flex min-w-[720px] items-center gap-2">
         {steps.map((s, i) => (
           <div key={s.key} className="flex items-center gap-2 flex-1">
             <div className="flex items-center gap-2">

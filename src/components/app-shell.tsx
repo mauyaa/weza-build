@@ -34,11 +34,11 @@ export function AppShell({
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-ink-200 bg-white">
-        <div className="mx-auto max-w-7xl px-6 h-14 flex items-center gap-6">
+        <div className="mx-auto flex min-h-14 max-w-7xl flex-wrap items-center gap-2 px-4 py-2 md:flex-nowrap md:gap-6 md:px-6 md:py-0">
           <Link href="/app" className="flex items-center gap-2">
             <WezaWordmark />
           </Link>
-          <nav className="flex items-center gap-1 ml-4">
+          <nav className="order-3 flex w-full items-center gap-1 overflow-x-auto md:order-none md:ml-4 md:w-auto">
             {nav.map((item) => {
               const active = currentPath === item.href || (item.href !== "/app" && currentPath?.startsWith(item.href));
               return (
@@ -57,12 +57,12 @@ export function AppShell({
               );
             })}
           </nav>
-          <div className="ml-auto flex items-center gap-3">
-            <span className="text-xs text-ink-500 hidden md:inline">Devnet</span>
+          <div className="ml-auto flex items-center gap-2 md:gap-3">
+            <span className="text-xs font-medium text-emerald-700 hidden md:inline">Solana devnet proof</span>
             <RolePill role={profile.role} />
             <div className="text-sm text-ink-700 hidden sm:block">{profile.full_name}</div>
             <form action="/api/auth/logout" method="post">
-              <button className="btn-ghost" type="submit">Sign out</button>
+              <button className="btn-ghost px-2.5 md:px-3.5" type="submit">Sign out</button>
             </form>
           </div>
         </div>

@@ -43,21 +43,26 @@ export function SubmitPanel({
     fd.set("title", title);
     fd.set("note", note);
     fd.set("file", file);
-    const res = await fetch(`/api/milestones/${milestoneId}/submit`, {
-      method: "POST",
-      body: fd,
-    });
-    const json = await res.json();
-    setSubmitting(false);
-    if (!json.success) {
-      setError(json.message || "Submit failed");
-      return;
+    try {
+      const res = await fetch(`/api/milestones/${milestoneId}/submit`, {
+        method: "POST",
+        body: fd,
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) {
+        setError(json?.message || "Submit failed");
+        return;
+      }
+      setTitle("");
+      setNote("");
+      setFile(null);
+      if (fileInput.current) fileInput.current.value = "";
+      startTransition(() => router.refresh());
+    } catch {
+      setError("Submission could not reach the server. Try again.");
+    } finally {
+      setSubmitting(false);
     }
-    setTitle("");
-    setNote("");
-    setFile(null);
-    if (fileInput.current) fileInput.current.value = "";
-    startTransition(() => router.refresh());
   }
 
   return (
@@ -68,6 +73,9 @@ export function SubmitPanel({
         </h2>
       </div>
       <form onSubmit={onSubmit} className="space-y-4">
+        <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
+          One active version at a time. After submission, this package is locked until the certifier decides.
+        </p>
         <div>
           <label className="label">Package title</label>
           <input

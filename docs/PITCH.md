@@ -64,11 +64,11 @@ Target length: **2:30**. Screen-only. Founder narrating off-camera. Every action
 
 ### 1:10 — 1:50
 
-"Owner clicks Trigger payout · 120,000 USDC. Server-side, we lock the payout row in a `SELECT FOR UPDATE`, build a Solana transaction with two instructions — a Memo Program instruction carrying the JSON metadata, and a `TransferChecked` from the treasury's USDC ATA to the contractor's USDC ATA — and send it to devnet via Helius. We wait for confirmed commitment."
+"Owner clicks Trigger payout · 4 USDC. The amount is intentionally demo-sized. Server-side, we atomically claim the payout, build a Solana transaction with two instructions — a Memo Program instruction carrying the JSON metadata, and a `TransferChecked` from the treasury's USDC ATA to the contractor's USDC ATA — and send it to devnet via Helius. We wait for confirmed commitment."
 
 ### 1:50 — 2:15
 
-"Page rebuilds. Big green 'Settled on Solana devnet — 120,000 USDC' banner at the top. View on Explorer."
+"Page rebuilds. A prominent Solana payout proof card shows the full signature, confirms the audit record updated, and links directly to Solana Explorer devnet."
 
 *(Click through. Show the Explorer view with the Memo instruction expanded: `app:"weza-build"`, project code, milestone sequence, submission id, approver id. Show the TransferChecked for the USDC mint.)*
 

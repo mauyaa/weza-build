@@ -9,15 +9,20 @@ export default async function AuditPage() {
   const events = await recentAudit(profile, 200);
   return (
     <div className="mx-auto max-w-5xl px-6 py-8 space-y-4">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Audit</h1>
+      <div className="flex items-baseline justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Milestone & payment audit trail</h1>
+          <p className="mt-1 text-sm text-ink-500">
+            Every major action is recorded. Confirmed payouts include full Solana devnet proof.
+          </p>
+        </div>
         <span className="text-xs text-ink-500">{events.length} events</span>
       </div>
       <div className="card divide-y divide-ink-100">
         {events.length === 0 ? (
           <div className="p-10 text-sm text-ink-500 text-center">No events yet.</div>
         ) : (
-          events.map((e) => <AuditRow key={e.id} event={e} />)
+          events.map((e) => <AuditRow key={e.id} event={e} showProof />)
         )}
       </div>
     </div>

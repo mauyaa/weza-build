@@ -40,6 +40,7 @@ describe("approval-to-payout flow", () => {
       note: "fix X",
     });
     expect(d1.submission.status).toBe("revision_requested");
+    expect(d1.milestone.status).toBe("awaiting_submission");
 
     const s2 = await submit(fx.milestone.id, fx.contractor, 2);
     expect(s2.submission.status).toBe("under_review");
@@ -130,6 +131,37 @@ describe("approval-to-payout flow", () => {
     await expect(submit(fx.milestone.id, fx.contractor, 2)).rejects.toBeInstanceOf(DomainError);
   });
 
+  it("requires a note for revision requests and rejections", async () => {
+    const fx = await seedFixture();
+    const s1 = await submit(fx.milestone.id, fx.contractor, 1);
+    await expect(
+      decide({
+        submissionId: s1.submission.id,
+        actor: fx.certifier,
+        action: "request_revision",
+        note: "",
+      })
+    ).rejects.toBeInstanceOf(DomainError);
+  });
+
+  it("returns a rejected submission to the contractor for resubmission", async () => {
+    const fx = await seedFixture();
+    const s1 = await submit(fx.milestone.id, fx.contractor, 1);
+    const rejected = await decide({
+      submissionId: s1.submission.id,
+      actor: fx.certifier,
+      action: "reject",
+      note: "Replace the evidence package",
+    });
+
+    expect(rejected.submission.status).toBe("rejected");
+    expect(rejected.milestone.status).toBe("awaiting_submission");
+
+    const s2 = await submit(fx.milestone.id, fx.contractor, 2);
+    expect(s2.submission.status).toBe("under_review");
+    expect(s2.submission.current_version).toBe(2);
+  });
+
   it("records payout failure and keeps milestone recoverable", async () => {
     const fx = await seedFixture();
     const s1 = await submit(fx.milestone.id, fx.contractor, 1);
@@ -152,5 +184,26 @@ describe("approval-to-payout flow", () => {
     });
     expect(retry.milestone.status).toBe("settled");
     expect(retry.payout.tx_signature).toBe("RETRY_SIG");
+  });
+
+  it("does not treat an unconfirmed Solana response as a successful payout", async () => {
+    const fx = await seedFixture();
+    const s1 = await submit(fx.milestone.id, fx.contractor, 1);
+    await decide({ submissionId: s1.submission.id, actor: fx.certifier, action: "approve", note: "" });
+
+    const result = await triggerPayout({
+      milestoneId: fx.milestone.id,
+      actor: fx.owner,
+      runOnChain: async () => ({
+        txSignature: "UNCONFIRMED_SIG",
+        network: "solana-devnet",
+        confirmed: false,
+      }),
+    });
+
+    expect(result.payout.status).toBe("failed");
+    expect(result.payout.tx_signature).toBeNull();
+    expect(result.milestone.status).toBe("approved");
+    expect(result.milestone.payout_status).toBe("failed");
   });
 });

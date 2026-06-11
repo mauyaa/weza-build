@@ -105,19 +105,15 @@ async function main() {
     )
   ).rows[0].id;
 
-  // Milestone A: fully settled (pre-approved + paid on devnet).
+  // Milestone A: approved and ready for a real devnet payout. Never seed a
+  // synthetic signature as settled proof.
   const m1aRes = await query<{ id: string }>(
     `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, status, payout_status, due_date)
-     VALUES ($1, 1, 'Site clearance & setting out', 'Survey, grading, and boundary pegs', 48000, 'settled', 'confirmed', '2025-02-10')
+     VALUES ($1, 1, 'Site clearance & setting out', 'Survey, grading, and boundary pegs', 1, 'approved', 'ready', '2025-02-10')
      RETURNING id`,
     [p1Id]
   );
   const m1a = m1aRes.rows[0].id;
-  const sigA = "DEMO" + crypto.randomBytes(32).toString("base64").slice(0, 60);
-  await query("UPDATE milestones SET payout_tx_signature = $1, payout_triggered_at = now() WHERE id = $2", [
-    sigA,
-    m1a,
-  ]);
   const subARes = await query<{ id: string }>(
     `INSERT INTO submissions (milestone_id, contractor_id, status, current_version)
      VALUES ($1, $2, 'approved', 1) RETURNING id`,
@@ -130,17 +126,15 @@ async function main() {
     [subA, sha256("NMT-site-clearance-v1"), contractorId]
   );
   await query(
-    `INSERT INTO payout_instructions (milestone_id, amount_usdc, recipient_wallet, status, tx_signature, network, triggered_by, triggered_at, confirmed_at)
-     VALUES ($1, 48000, $2, 'confirmed', $3, 'solana-devnet', $4, now(), now())`,
-    [m1a, contractor.wallet_address, sigA, ownerId]
+    `INSERT INTO payout_instructions (milestone_id, amount_usdc, recipient_wallet, status, network)
+     VALUES ($1, 1, $2, 'ready', 'solana-devnet')`,
+    [m1a, contractor.wallet_address]
   );
   for (const ev of [
     { actor: contractor, action: "submission.submitted", message: "Submitted v1: Site clearance photo log" },
     { actor: certifier, action: "submission.approved", message: "Approved v1" },
     { actor: certifier, action: "milestone.approved", message: "Milestone Site clearance & setting out approved" },
-    { actor: certifier, action: "milestone.payout_ready", message: "Payout ready: 48000.00 USDC" },
-    { actor: owner, action: "payout.triggered", message: "Payout triggered: 48000.00 USDC" },
-    { actor: owner, action: "payout.confirmed", message: "Payout confirmed on solana-devnet", txSignature: sigA },
+    { actor: certifier, action: "milestone.payout_ready", message: "Payout ready: 1.00 devnet USDC" },
   ] as const) {
     await writeAudit({
       orgId,
@@ -150,7 +144,6 @@ async function main() {
       actor: ev.actor,
       action: ev.action as never,
       message: ev.message,
-      txSignature: (ev as { txSignature?: string }).txSignature ?? null,
     });
   }
 
@@ -158,7 +151,7 @@ async function main() {
   const m1b = (
     await query<{ id: string }>(
       `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, due_date)
-       VALUES ($1, 2, 'Foundation & piling', 'Rebar, formwork, concrete pour & cure', 180000, '2025-04-30')
+       VALUES ($1, 2, 'Foundation & piling', 'Rebar, formwork, concrete pour & cure', 2, '2025-04-30')
        RETURNING id`,
       [p1Id]
     )
@@ -202,7 +195,7 @@ async function main() {
   const m1c = (
     await query<{ id: string }>(
       `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, due_date)
-       VALUES ($1, 3, 'Ground floor slab', 'Slab pour and curing evidence', 95000, '2025-05-22')
+       VALUES ($1, 3, 'Ground floor slab', 'Slab pour and curing evidence', 3, '2025-05-22')
        RETURNING id`,
       [p1Id]
     )
@@ -231,7 +224,7 @@ async function main() {
   // Milestone D: awaiting submission.
   await query(
     `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, due_date)
-     VALUES ($1, 4, 'Superstructure — L1 slab', 'Formwork, rebar, pour for Level 1', 120000, '2025-06-30')`,
+     VALUES ($1, 4, 'Superstructure — L1 slab', 'Formwork, rebar, pour for Level 1', 4, '2025-06-30')`,
     [p1Id]
   );
 
@@ -246,13 +239,13 @@ async function main() {
   ).rows[0].id;
   await query(
     `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, due_date)
-     VALUES ($1, 1, 'Earthworks & cut-to-fill', 'Bulk earthworks balance', 52000, '2025-05-05')`,
+     VALUES ($1, 1, 'Earthworks & cut-to-fill', 'Bulk earthworks balance', 2.5, '2025-05-05')`,
     [p2Id]
   );
   const m2b = (
     await query<{ id: string }>(
       `INSERT INTO milestones (project_id, sequence, title, scope, payout_amount_usdc, due_date)
-       VALUES ($1, 2, 'Retaining walls', 'RC retaining wall pours', 78000, '2025-06-10')
+       VALUES ($1, 2, 'Retaining walls', 'RC retaining wall pours', 3.5, '2025-06-10')
        RETURNING id`,
       [p2Id]
     )

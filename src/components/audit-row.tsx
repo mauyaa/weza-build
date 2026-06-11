@@ -1,5 +1,6 @@
 import { formatDateTime, shortSig, timeAgo } from "@/lib/format";
 import type { AuditLog } from "@/lib/types";
+import { SolanaProof } from "./solana-proof";
 
 const actionLabel: Record<AuditLog["action"], { label: string; tone: string }> = {
   "submission.submitted": { label: "Submitted", tone: "text-blue-700 bg-blue-50 border-blue-200" },
@@ -15,7 +16,15 @@ const actionLabel: Record<AuditLog["action"], { label: string; tone: string }> =
   "payout.failed": { label: "Payout failed", tone: "text-red-700 bg-red-50 border-red-200" },
 };
 
-export function AuditRow({ event, compact }: { event: AuditLog; compact?: boolean }) {
+export function AuditRow({
+  event,
+  compact,
+  showProof,
+}: {
+  event: AuditLog;
+  compact?: boolean;
+  showProof?: boolean;
+}) {
   const meta = actionLabel[event.action] ?? { label: event.action, tone: "text-ink-600 bg-ink-50 border-ink-200" };
   return (
     <div className="flex gap-3 px-4 py-3">
@@ -41,6 +50,11 @@ export function AuditRow({ event, compact }: { event: AuditLog; compact?: boolea
             </>
           )}
         </div>
+        {event.tx_signature && showProof && (
+          <div className="mt-3">
+            <SolanaProof signature={event.tx_signature} compact />
+          </div>
+        )}
       </div>
     </div>
   );

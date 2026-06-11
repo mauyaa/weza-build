@@ -16,6 +16,7 @@ describe("state machine", () => {
   it("allows revision loop", () => {
     expect(canTransitionSubmission("under_review", "revision_requested")).toBe(true);
     expect(canTransitionSubmission("revision_requested", "resubmitted")).toBe(true);
+    expect(canTransitionSubmission("rejected", "resubmitted")).toBe(true);
     expect(canTransitionSubmission("resubmitted", "under_review")).toBe(true);
     expect(canTransitionSubmission("under_review", "approved")).toBe(true);
   });

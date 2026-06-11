@@ -104,7 +104,7 @@ export async function listProjectsForUser(profile: Profile): Promise<ProjectSumm
       (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id)::int AS total_milestones,
       (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id AND m.status IN ('awaiting_submission','under_review','disputed'))::int AS active_milestones,
       (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id AND m.status = 'approved')::int AS approved_milestones,
-      (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id AND m.payout_status = 'ready')::int AS payout_ready,
+      (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id AND m.payout_status IN ('ready','failed'))::int AS payout_ready,
       (SELECT COUNT(*) FROM milestones m WHERE m.project_id = p.id AND m.status = 'settled')::int AS settled,
       (SELECT MAX(a.created_at) FROM audit_logs a WHERE a.project_id = p.id) AS last_activity_at
     FROM projects p
@@ -329,9 +329,59 @@ export interface SubmitPackageResult {
   audit: AuditLog;
 }
 
+export async function assertSubmissionUploadAllowed(
+  milestoneId: string,
+  actor: Profile
+): Promise<{ milestone: Milestone; submission: Submission | null }> {
+  if (actor.role !== "contractor") {
+    throw new DomainError("forbidden", "Only contractors can submit packages", 403);
+  }
+  const milestone = await getMilestone(milestoneId);
+  if (!milestone) throw new DomainError("not_found", "Milestone not found", 404);
+  const project = await getProject(milestone.project_id);
+  if (!project) throw new DomainError("not_found", "Project not found", 404);
+  if (project.contractor_id !== actor.id) {
+    throw new DomainError("forbidden", "Only assigned contractor can submit", 403);
+  }
+  if (
+    milestone.status === "approved" ||
+    milestone.status === "payout_triggered" ||
+    milestone.status === "settled"
+  ) {
+    throw new DomainError(
+      "milestone_closed",
+      "Milestone is already approved and cannot accept submissions",
+      409
+    );
+  }
+
+  const submission = await getSubmissionForMilestone(milestoneId);
+  if (submission?.status === "approved") {
+    throw new DomainError("already_approved", "Submission is already approved", 409);
+  }
+  if (
+    submission?.status === "submitted" ||
+    submission?.status === "under_review" ||
+    submission?.status === "resubmitted"
+  ) {
+    throw new DomainError(
+      "awaiting_review",
+      "A version is already awaiting certifier review",
+      409
+    );
+  }
+  return { milestone, submission };
+}
+
 export async function submitPackage(input: SubmitPackageInput): Promise<SubmitPackageResult> {
   if (input.actor.role !== "contractor") {
     throw new DomainError("forbidden", "Only contractors can submit packages", 403);
+  }
+  if (input.title.trim().length < 3) {
+    throw new DomainError("validation", "Package title must be at least 3 characters", 400);
+  }
+  if (!input.fileName.trim()) {
+    throw new DomainError("validation", "A drawing or evidence file is required", 400);
   }
   const milestone = await getMilestone(input.milestoneId);
   if (!milestone) throw new DomainError("not_found", "Milestone not found", 404);
@@ -514,6 +564,13 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
   if (input.actor.role !== "certifier") {
     throw new DomainError("forbidden", "Only certifiers can decide", 403);
   }
+  if (input.action !== "approve" && !input.note.trim()) {
+    throw new DomainError(
+      "note_required",
+      "Revision requests and rejections require a decision note",
+      400
+    );
+  }
   const sub = await first<Submission>("SELECT * FROM submissions WHERE id = $1", [input.submissionId]);
   if (!sub) throw new DomainError("not_found", "Submission not found", 404);
   const milestone = (await getMilestone(sub.milestone_id))!;
@@ -556,6 +613,7 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
 
     if (input.action === "request_revision") {
       await transitionSubmission(client, sub.id, "revision_requested");
+      await transitionMilestone(client, milestone.id, "awaiting_submission");
       audits.push(
         await writeAuditTx(client, {
           orgId: project.org_id,
@@ -624,6 +682,7 @@ export async function decide(input: DecideInput): Promise<DecideResult> {
       );
     } else if (input.action === "reject") {
       await transitionSubmission(client, sub.id, "rejected");
+      await transitionMilestone(client, milestone.id, "awaiting_submission");
       audits.push(
         await writeAuditTx(client, {
           orgId: project.org_id,
@@ -707,15 +766,23 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
     throw new DomainError("invalid_state", `Payout in state ${payout.status}`, 409);
   }
 
-  // Move to triggered first (lock), then perform on-chain call.
+  // Atomically claim the payout before broadcasting. Only the request that
+  // changes ready/failed -> triggered is allowed to reach the chain.
   const audits: AuditLog[] = [];
-  await withTx(async (client) => {
-    await client.query(
+  const claimed = await withTx(async (client) => {
+    const claim = await client.query<PayoutInstruction>(
       `UPDATE payout_instructions
-         SET status = 'triggered', triggered_by = $2, triggered_at = now()
-       WHERE id = $1`,
+         SET status = 'triggered',
+             triggered_by = $2,
+             triggered_at = now(),
+             tx_signature = NULL,
+             confirmed_at = NULL,
+             failure_reason = NULL
+       WHERE id = $1 AND status IN ('ready', 'failed')
+       RETURNING *`,
       [payout.id, input.actor.id]
     );
+    if (claim.rowCount === 0) return false;
     await transitionPayout(client, milestone.id, "triggered");
     await transitionMilestone(client, milestone.id, "payout_triggered");
     audits.push(
@@ -730,7 +797,15 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
         )}`,
       })
     );
+    return true;
   });
+  if (!claimed) {
+    return {
+      payout: (await getLatestPayout(milestone.id))!,
+      milestone: (await getMilestone(milestone.id))!,
+      audit: [],
+    };
+  }
 
   try {
     const approvedSubmission = await first<Submission>(
@@ -748,40 +823,36 @@ export async function triggerPayout(input: TriggerPayoutInput): Promise<TriggerP
         approvedBy: project.certifier_id,
       },
     });
+    if (!result.confirmed) {
+      throw new Error(`Solana transaction ${result.txSignature} was not confirmed`);
+    }
     await withTx(async (client) => {
-      if (result.confirmed) {
-        await client.query(
-          `UPDATE payout_instructions
-             SET tx_signature = $2, status = 'confirmed', confirmed_at = now()
-           WHERE id = $1`,
-          [payout.id, result.txSignature]
-        );
-        await client.query(
-          `UPDATE milestones
-             SET status = 'settled',
-                 payout_status = 'confirmed',
-                 payout_tx_signature = $2,
-                 payout_triggered_at = COALESCE(payout_triggered_at, now())
-           WHERE id = $1`,
-          [milestone.id, result.txSignature]
-        );
-        audits.push(
-          await writeAuditTx(client, {
-            orgId: project.org_id,
-            projectId: project.id,
-            milestoneId: milestone.id,
-            actor: input.actor,
-            action: "payout.confirmed",
-            message: `Payout confirmed on ${result.network}`,
-            txSignature: result.txSignature,
-          })
-        );
-      } else {
-        await client.query(
-          "UPDATE payout_instructions SET tx_signature = $2 WHERE id = $1",
-          [payout.id, result.txSignature]
-        );
-      }
+      await client.query(
+        `UPDATE payout_instructions
+           SET tx_signature = $2, status = 'confirmed', confirmed_at = now(), failure_reason = NULL
+         WHERE id = $1`,
+        [payout.id, result.txSignature]
+      );
+      await client.query(
+        `UPDATE milestones
+           SET status = 'settled',
+               payout_status = 'confirmed',
+               payout_tx_signature = $2,
+               payout_triggered_at = COALESCE(payout_triggered_at, now())
+         WHERE id = $1`,
+        [milestone.id, result.txSignature]
+      );
+      audits.push(
+        await writeAuditTx(client, {
+          orgId: project.org_id,
+          projectId: project.id,
+          milestoneId: milestone.id,
+          actor: input.actor,
+          action: "payout.confirmed",
+          message: `Payout confirmed on ${result.network}`,
+          txSignature: result.txSignature,
+        })
+      );
     });
     const refreshedPayout = (await getLatestPayout(milestone.id))!;
     const refreshedMilestone = (await getMilestone(milestone.id))!;

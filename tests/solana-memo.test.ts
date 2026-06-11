@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { decide, submitPackage, triggerPayout } from "../src/lib/repo";
 import { sha256 } from "../src/lib/ids";
+import { safeSolanaError } from "../src/lib/solana";
 import { seedFixture } from "./helpers";
 
 describe("on-chain payout envelope", () => {
+  it("redacts secret-bearing RPC URLs from public errors", () => {
+    const message = safeSolanaError(
+      new Error("request failed at https://devnet.helius-rpc.com/?api-key=secret-value")
+    );
+    expect(message).not.toContain("secret-value");
+    expect(message).toContain("[redacted RPC endpoint]");
+  });
+
   it("passes project/milestone/submission metadata into runOnChain memo", async () => {
     const fx = await seedFixture();
     const s1 = await submitPackage({

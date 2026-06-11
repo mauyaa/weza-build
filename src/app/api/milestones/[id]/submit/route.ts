@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import crypto from "node:crypto";
 import { created } from "@/lib/api";
 import { handleDomain, requireSession } from "@/lib/guard";
-import { getMilestone, getSubmissionForMilestone, submitPackage } from "@/lib/repo";
+import { assertSubmissionUploadAllowed, submitPackage } from "@/lib/repo";
 import { storeFile } from "@/lib/storage";
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
@@ -54,9 +54,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   if (file.size > MAX_FILE_BYTES) return handleDomain(new Error("File exceeds 25MB limit"));
 
   try {
-    const milestone = await getMilestone(params.id);
-    if (!milestone) return handleDomain(new Error("Milestone not found"));
-    const existing = await getSubmissionForMilestone(milestone.id);
+    // Reject role/state violations before writing to private storage. The
+    // transactional submitPackage check still protects against races.
+    const { submission: existing } = await assertSubmissionUploadAllowed(params.id, guard.profile);
     const tentativeSubmissionId =
       existing?.id ?? `sub_tmp_${crypto.randomBytes(6).toString("hex")}`;
     const nextVersion = (existing?.current_version ?? 0) + 1;
