@@ -27,10 +27,10 @@ export function AuditRow({
 }) {
   const meta = actionLabel[event.action] ?? { label: event.action, tone: "text-ink-600 bg-ink-50 border-ink-200" };
   return (
-    <div className="flex gap-3 px-4 py-3">
-      <span className={`chip ${meta.tone} shrink-0`}>{meta.label}</span>
+    <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:gap-3">
+      <span className={`chip ${meta.tone} shrink-0 self-start`}>{meta.label}</span>
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-ink-900 truncate">{event.message}</div>
+        <div className="text-sm text-ink-900 sm:truncate">{event.message}</div>
         <div className="text-xs text-ink-500 mt-0.5">
           {event.actor_name ?? "system"}
           {event.actor_role ? ` · ${event.actor_role}` : ""}
