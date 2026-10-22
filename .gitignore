@@ -13,4 +13,3 @@ coverage/
 .vercel
 tsconfig.tsbuildinfo
 artifacts/
-docs/grant-submission/codex-session-redacted.jsonl

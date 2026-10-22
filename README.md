@@ -127,12 +127,6 @@ docs/             Demo, deployment, release, pitch, and risk documentation
 public/brand/     WEZA brand assets
 ```
 
-## What grant support will fund
-
-Grant support will fund an AI coding subscription used to harden and ship the real product codebase: stronger automated verification, production monitoring, security review, payout reliability, deployment tooling, and faster iteration with construction design partners.
-
-The proposed next phase is documented in [`docs/SUPERTEAM_AGENTIC_ENGINEERING_GRANT.md`](docs/SUPERTEAM_AGENTIC_ENGINEERING_GRANT.md): AI-assisted milestone verification with human certifier accountability, followed by an audited Anchor escrow program.
-
 ## Ownership and license
 
 WEZA Build is a solo-founder project designed, built, and shipped by **Bevan Mauya Bosire**.
